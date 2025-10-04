@@ -48,10 +48,10 @@ export async function POST(request: NextRequest) {
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Create user
+    // Create user with default role as 'USER'
     const result = await pool.query(
-      'INSERT INTO users (username, email, contact_number, password_hash) VALUES ($1, $2, $3, $4) RETURNING id, username, email, contact_number, created_at',
-      [username, email, contactNumber || null, passwordHash]
+      'INSERT INTO users (username, email, contact_number, password_hash, user_role) VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, contact_number, user_role, created_at',
+      [username, email, contactNumber || null, passwordHash, 'USER']
     );
 
     const newUser = result.rows[0];
@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
           username: newUser.username,
           email: newUser.email,
           contactNumber: newUser.contact_number,
+          userRole: newUser.user_role,
           createdAt: newUser.created_at
         }
       },
