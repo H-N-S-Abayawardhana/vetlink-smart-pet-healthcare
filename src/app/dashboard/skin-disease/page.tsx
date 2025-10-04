@@ -5,6 +5,7 @@ import ImageUpload from '@/components/dashboard/skin-disease/ImageUpload';
 import CameraCapture from '@/components/dashboard/skin-disease/CameraCapture';
 import SkinAnalysis from '@/components/dashboard/skin-disease/SkinAnalysis';
 import Instructions from '@/components/dashboard/skin-disease/Instructions';
+import { AuthGuard } from '@/lib/auth-guard';
 
 // Force dynamic rendering to prevent SSR issues
 export const dynamic = 'force-dynamic';
@@ -62,7 +63,8 @@ export default function SkinDiseaseDetectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+    <AuthGuard allowedRoles={['SUPER_ADMIN', 'VETERINARIAN']}>
+      <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -190,5 +192,6 @@ export default function SkinDiseaseDetectionPage() {
         </div>
       </div>
     </div>
+    </AuthGuard>
   );
 }

@@ -61,7 +61,7 @@ export default function Navigation() {
       isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 sm:h-18">
+        <div className="flex justify-between items-center h-16 sm:h-18 lg:h-20">
           <div className="flex items-center">
             <div className="flex-shrink-0">
             <Link href="/" passHref>
@@ -78,34 +78,41 @@ export default function Navigation() {
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <a href="#features" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+          <div className="hidden md:block flex-1">
+            <div className="flex items-center justify-center space-x-6">
+              <a href="#features" className="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-semibold transition-colors">
                 Features
               </a>
-              <a href="#about" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <a href="#about" className="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-semibold transition-colors">
                 About
               </a>
-              <a href="#pricing" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <a href="#pricing" className="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-semibold transition-colors">
                 Pricing
               </a>
-              <a href="#testimonials" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <a href="#testimonials" className="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-semibold transition-colors">
                 Testimonials
               </a>
-              <a href="#contact" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              <a href="#contact" className="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-semibold transition-colors">
                 Contact
               </a>
-              <a href="/signin" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
-                Sign In
-              </a>
             </div>
+          </div>
+
+          {/* Sign In & Sign Up Buttons - Desktop */}
+          <div className="hidden md:flex items-center space-x-3">
+            <a href="/signin" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+              Sign In
+            </a>
+            <a href="/signup" className="border border-gray-300 text-gray-700 hover:text-blue-600 hover:border-blue-600 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+              Sign Up
+            </a>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              className="p-3 text-gray-900 hover:text-blue-600 hover:bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors touch-manipulation"
               aria-label="Toggle mobile menu"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -122,49 +129,56 @@ export default function Navigation() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden animate-in slide-in-from-top-2 duration-200">
-            <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3 bg-white border-t border-gray-200 shadow-lg">
+            <div className="px-2 pt-3 pb-5 space-y-2 sm:px-3 bg-white border-t border-gray-200 shadow-lg">
               <a 
                 href="#features" 
-                className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                className="text-gray-900 hover:text-blue-600 hover:bg-gray-50 block px-4 py-4 rounded-lg text-base font-semibold transition-colors touch-manipulation"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
               </a>
               <a 
                 href="#about" 
-                className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                className="text-gray-900 hover:text-blue-600 hover:bg-gray-50 block px-4 py-4 rounded-lg text-base font-semibold transition-colors touch-manipulation"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </a>
               <a 
                 href="#pricing" 
-                className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                className="text-gray-900 hover:text-blue-600 hover:bg-gray-50 block px-4 py-4 rounded-lg text-base font-semibold transition-colors touch-manipulation"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Pricing
               </a>
               <a 
                 href="#testimonials" 
-                className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                className="text-gray-900 hover:text-blue-600 hover:bg-gray-50 block px-4 py-4 rounded-lg text-base font-semibold transition-colors touch-manipulation"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Testimonials
               </a>
               <a 
                 href="#contact" 
-                className="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                className="text-gray-900 hover:text-blue-600 hover:bg-gray-50 block px-4 py-4 rounded-lg text-base font-semibold transition-colors touch-manipulation"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
               </a>
-              <div className="pt-2 border-t border-gray-200">
+              <div className="pt-3 border-t border-gray-200 space-y-2">
                 <a 
                   href="/signin" 
-                  className="bg-blue-600 text-white block px-4 py-3 rounded-lg text-base font-medium hover:bg-blue-700 transition-colors text-center"
+                  className="bg-blue-600 text-white block px-4 py-4 rounded-lg text-base font-medium hover:bg-blue-700 transition-colors text-center touch-manipulation"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign In
+                </a>
+                <a 
+                  href="/signup" 
+                  className="border border-gray-300 text-gray-700 hover:text-blue-600 hover:border-blue-600 block px-4 py-4 rounded-lg text-base font-medium transition-colors text-center touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sign Up
                 </a>
               </div>
             </div>

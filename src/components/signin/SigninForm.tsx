@@ -52,8 +52,13 @@ export default function SigninForm() {
       if (result?.error) {
         setError('Invalid email or password');
       } else if (result?.ok) {
-        // Session created successfully, navigate to dashboard
-        router.push('/dashboard');
+        // Show success message before redirecting
+        setSuccessMessage('Sign in Successfully! Redirecting...');
+        
+        // Navigate to dashboard after a short delay to show the success message
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1500);
       }
     } catch (error) {
       setError('An error occurred during sign in');
@@ -66,7 +71,13 @@ export default function SigninForm() {
     setError("");
     setSuccessMessage("");
     try {
-      await signIn('google', { callbackUrl: '/dashboard' });
+      // Show success message before redirecting
+      setSuccessMessage('Sign in Successfully! Redirecting...');
+      
+      // Small delay to show the message before redirect
+      setTimeout(() => {
+        signIn('google', { callbackUrl: '/dashboard' });
+      }, 500);
     } catch (error) {
       setError('An error occurred during Google sign in');
     }
@@ -213,7 +224,7 @@ export default function SigninForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex w-full justify-center rounded-lg bg-blue-600 px-4 py-3 text-base font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex w-full justify-center rounded-lg bg-blue-600 px-4 py-3 text-base font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
                     {isLoading ? 'Signing in...' : 'Sign in'}
                   </button>
@@ -235,7 +246,7 @@ export default function SigninForm() {
                 <button
                   type="button"
                   onClick={handleGoogleSignIn}
-                  className="flex w-full items-center justify-center gap-3 rounded-lg bg-white px-4 py-3 text-base font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                  className="flex w-full items-center justify-center gap-3 rounded-lg bg-white px-4 py-3 text-base font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors cursor-pointer"
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
                     <path

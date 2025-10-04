@@ -1,5 +1,6 @@
 import Navigation from "../components/website/Navigation";
 import Hero from "../components/website/Hero";
+import PrimaryFeatures from "../components/website/PrimaryFeatures";
 import Features from "../components/website/Features";
 import About from "../components/website/About";
 import Pricing from "../components/website/Pricing";
@@ -13,6 +14,7 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       <Navigation />
       <Hero />
+      <PrimaryFeatures />
       <Features />
       <About />
       <Pricing />

@@ -17,63 +17,36 @@ import {
   CogIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
+import { getAllowedNavigationItems } from '@/lib/rbac';
+import { UserRole } from '@/types/next-auth';
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-const navigationItems = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: <HomeIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'Pets',
-    href: '/dashboard/pets',
-    icon: <HeartIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'Health Records',
-    href: '/dashboard/health-records',
-    icon: <DocumentTextIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'Appointments',
-    href: '/dashboard/appointments',
-    icon: <CalendarIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'Medications',
-    href: '/dashboard/medications',
-    icon: <BeakerIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'AI Analysis',
-    href: '/dashboard/ai-analysis',
-    icon: <LightBulbIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'Skin Disease Detection',
-    href: '/dashboard/skin-disease',
-    icon: <EyeIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'Profile',
-    href: '/dashboard/profile',
-    icon: <UserIcon className="w-5 h-5" />,
-  },
-  {
-    name: 'Settings',
-    href: '/dashboard/settings',
-    icon: <CogIcon className="w-5 h-5" />,
-  },
-];
+// Icon mapping for navigation items
+const iconMap = {
+  HomeIcon: HomeIcon,
+  HeartIcon: HeartIcon,
+  DocumentTextIcon: DocumentTextIcon,
+  CalendarIcon: CalendarIcon,
+  BeakerIcon: BeakerIcon,
+  LightBulbIcon: LightBulbIcon,
+  EyeIcon: EyeIcon,
+  UserIcon: UserIcon,
+  CogIcon: CogIcon,
+};
 
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  
+  // Get user role from session
+  const userRole = (session?.user as any)?.userRole as UserRole || 'USER';
+  
+  // Get allowed navigation items based on user role
+  const allowedNavigationItems = getAllowedNavigationItems(userRole);
 
   return (
     <>
@@ -106,7 +79,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </div>
           <button
             onClick={onToggle}
-            className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
@@ -114,8 +87,9 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
         <nav className="mt-6 px-3">
           <div className="space-y-3">
-            {navigationItems.map((item) => {
+            {allowedNavigationItems.map((item) => {
               const isActive = pathname === item.href;
+              const IconComponent = iconMap[item.icon as keyof typeof iconMap];
               return (
                 <Link
                   key={item.name}
@@ -132,7 +106,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                       isActive ? 'text-blue-700' : 'text-gray-400 group-hover:text-gray-500'
                     }`}
                   >
-                    {item.icon}
+                    <IconComponent className="w-5 h-5" />
                   </span>
                   {item.name}
                 </Link>
@@ -156,7 +130,10 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               <p className="text-sm font-medium text-gray-900">
                 {(session?.user as any)?.username || session?.user?.name || 'User'}
               </p>
-              <p className="text-xs text-gray-500">VetLink User</p>
+              <p className="text-xs text-gray-500">
+                {userRole === 'SUPER_ADMIN' ? 'Super Admin' : 
+                 userRole === 'VETERINARIAN' ? 'Veterinarian' : 'User'}
+              </p>
             </div>
           </div>
         </div>

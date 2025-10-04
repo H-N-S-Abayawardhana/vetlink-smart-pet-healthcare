@@ -1,5 +1,8 @@
 import NextAuth from "next-auth";
 
+// Define user roles
+export type UserRole = 'SUPER_ADMIN' | 'VETERINARIAN' | 'USER';
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -10,6 +13,7 @@ declare module "next-auth" {
       contactNumber?: string;
       createdAt: string;
       lastLogin?: string;
+      userRole: UserRole;
     };
   }
 
@@ -21,6 +25,7 @@ declare module "next-auth" {
     contactNumber?: string;
     createdAt: string;
     lastLogin?: string;
+    userRole: UserRole;
   }
 }
 
@@ -31,5 +36,6 @@ declare module "next-auth/jwt" {
     contactNumber?: string;
     createdAt: string;
     lastLogin?: string;
+    userRole: UserRole;
   }
 }
