@@ -9,7 +9,7 @@ export default function Instructions() {
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+        className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
       >
         <div className="flex items-center">
           <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">

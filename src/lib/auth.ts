@@ -51,7 +51,8 @@ export const authOptions: NextAuthOptions = {
             username: user.username,
             contactNumber: user.contact_number,
             createdAt: user.created_at,
-            lastLogin: user.last_login
+            lastLogin: user.last_login,
+            userRole: user.user_role
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -81,9 +82,9 @@ export const authOptions: NextAuthOptions = {
             // Create new user for Google OAuth
             const username = user.name?.replace(/\s+/g, '').toLowerCase() || user.email?.split('@')[0] || 'user';
             const result = await pool.query(
-              `INSERT INTO users (username, email, password_hash, is_active, created_at, updated_at)
-               VALUES ($1, $2, $3, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-               RETURNING id, username, email, contact_number, created_at, last_login`,
+              `INSERT INTO users (username, email, password_hash, user_role, is_active, created_at, updated_at)
+               VALUES ($1, $2, $3, 'USER', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+               RETURNING id, username, email, contact_number, user_role, created_at, last_login`,
               [username, user.email, 'oauth_user'] // Special password hash for OAuth users
             );
 
@@ -91,6 +92,7 @@ export const authOptions: NextAuthOptions = {
             user.id = newUser.id.toString();
             (user as any).username = newUser.username;
             (user as any).contactNumber = newUser.contact_number;
+            (user as any).userRole = newUser.user_role;
             (user as any).createdAt = newUser.created_at;
             (user as any).lastLogin = newUser.last_login;
           } else {
@@ -104,6 +106,7 @@ export const authOptions: NextAuthOptions = {
             user.id = existingUserData.id.toString();
             (user as any).username = existingUserData.username;
             (user as any).contactNumber = existingUserData.contact_number;
+            (user as any).userRole = existingUserData.user_role;
             (user as any).createdAt = existingUserData.created_at;
             (user as any).lastLogin = existingUserData.last_login;
           }
@@ -119,6 +122,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.username = (user as any).username;
         token.contactNumber = (user as any).contactNumber;
+        token.userRole = (user as any).userRole;
         token.createdAt = (user as any).createdAt;
         token.lastLogin = (user as any).lastLogin;
         token.provider = account?.provider;
@@ -130,6 +134,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         (session.user as any).username = token.username;
         (session.user as any).contactNumber = token.contactNumber;
+        (session.user as any).userRole = token.userRole;
         (session.user as any).createdAt = token.createdAt;
         (session.user as any).lastLogin = token.lastLogin;
         (session.user as any).provider = token.provider;

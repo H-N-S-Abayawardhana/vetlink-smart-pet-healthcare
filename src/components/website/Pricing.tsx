@@ -72,7 +72,7 @@ export default function Pricing() {
                 <p className="text-sm text-blue-700">LKR 4,500 - 7,500 per session</p>
               </div>
 
-              <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+              <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
                 Start Free Trial
               </button>
             </div>
@@ -134,7 +134,7 @@ export default function Pricing() {
                 <p className="text-sm text-orange-700">SaaS License + 3% transaction commission</p>
               </div>
 
-              <button className="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">
+              <button className="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors cursor-pointer">
                 Contact Sales
               </button>
             </div>
@@ -197,7 +197,7 @@ export default function Pricing() {
                 <p className="text-sm text-purple-700">Flexible pricing based on clinic size</p>
               </div>
 
-              <button className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+              <button className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors cursor-pointer">
                 Get Custom Quote
               </button>
             </div>

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Alert from '@/components/ui/Alert';
+import { AuthGuard } from '@/lib/auth-guard';
+import { UserRole } from '@/types/next-auth';
 
 // Force dynamic rendering to prevent SSR issues
 export const dynamic = 'force-dynamic';
@@ -108,8 +110,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white shadow-sm rounded-lg">
+    <AuthGuard allowedRoles={['SUPER_ADMIN', 'VETERINARIAN']}>
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white shadow-sm rounded-lg">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -275,5 +278,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+    </AuthGuard>
   );
 }
