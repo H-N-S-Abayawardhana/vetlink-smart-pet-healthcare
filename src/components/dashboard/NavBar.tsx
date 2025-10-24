@@ -1,23 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
-import { UserRole } from '@/types/next-auth';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 interface NavBarProps {
   onMenuClick: () => void;
 }
 
 export default function NavBar({ onMenuClick }: NavBarProps) {
-  const { data: session } = useSession();
+  const { user, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   
-  // Get user role from session
-  const userRole = (session?.user as any)?.userRole as UserRole || 'USER';
+  // Get user role from user context
+  const userRole = user?.user_role || 'USER';
   
   // Get role display name and greeting
-  const getRoleDisplayName = (role: UserRole): string => {
+  const getRoleDisplayName = (role: string): string => {
     switch (role) {
       case 'SUPER_ADMIN':
         return 'Super Admin';
@@ -30,7 +29,7 @@ export default function NavBar({ onMenuClick }: NavBarProps) {
     }
   };
   
-  const getGreeting = (role: UserRole): string => {
+  const getGreeting = (role: string): string => {
     switch (role) {
       case 'SUPER_ADMIN':
         return 'Hi, Super Admin!';
@@ -43,7 +42,7 @@ export default function NavBar({ onMenuClick }: NavBarProps) {
     }
   };
   
-  const getGreetingColor = (role: UserRole): string => {
+  const getGreetingColor = (role: string): string => {
     switch (role) {
       case 'SUPER_ADMIN':
         return 'from-purple-50 to-purple-100 text-purple-700';
@@ -168,12 +167,12 @@ export default function NavBar({ onMenuClick }: NavBarProps) {
             >
               <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                 <span className="text-sm font-medium text-gray-700">
-                  {session?.user?.username?.charAt(0).toUpperCase() || 'U'}
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-gray-900">
-                  {session?.user?.username || 'User'}
+                  {user?.username || 'User'}
                 </p>
                 <p className="text-xs text-gray-500">{getRoleDisplayName(userRole)}</p>
               </div>
@@ -192,7 +191,7 @@ export default function NavBar({ onMenuClick }: NavBarProps) {
                       {getGreeting(userRole)}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {session?.user?.username || 'User'}
+                      {user?.username || 'User'}
                     </p>
                   </div>
                   
@@ -224,7 +223,7 @@ export default function NavBar({ onMenuClick }: NavBarProps) {
                   
                   <div className="border-t border-gray-100"></div>
                   <button 
-                    onClick={() => signOut({ callbackUrl: "/signin" })}
+                    onClick={() => logout()}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                   >
                     Sign out

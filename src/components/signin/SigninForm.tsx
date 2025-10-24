@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Alert from "@/components/ui/Alert";
 import Link from "next/link";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function SigninForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -43,25 +44,17 @@ export default function SigninForm() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else if (result?.ok) {
-        // Show success message before redirecting
-        setSuccessMessage('Sign in Successfully! Redirecting...');
-        
-        // Navigate to dashboard after a short delay to show the success message
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 1500);
-      }
+      await login(formData.email, formData.password);
+      
+      // Show success message before redirecting
+      setSuccessMessage('Sign in Successfully! Redirecting...');
+      
+      // Navigate to dashboard after a short delay to show the success message
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1500);
     } catch (error) {
-      setError('An error occurred during sign in');
+      setError(error instanceof Error ? error.message : 'An error occurred during sign in');
     } finally {
       setIsLoading(false);
     }
@@ -70,17 +63,7 @@ export default function SigninForm() {
   const handleGoogleSignIn = async () => {
     setError("");
     setSuccessMessage("");
-    try {
-      // Show success message before redirecting
-      setSuccessMessage('Sign in Successfully! Redirecting...');
-      
-      // Small delay to show the message before redirect
-      setTimeout(() => {
-        signIn('google', { callbackUrl: '/dashboard' });
-      }, 500);
-    } catch (error) {
-      setError('An error occurred during Google sign in');
-    }
+    setError('Google sign-in is not available with the new authentication system. Please use email and password.');
   };
 
   return (

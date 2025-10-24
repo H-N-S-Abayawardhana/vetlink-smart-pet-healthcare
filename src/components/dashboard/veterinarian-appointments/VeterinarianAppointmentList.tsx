@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Alert from '@/components/ui/Alert';
+import { appointmentService } from '@/lib';
 
 interface Appointment {
   id: number;
@@ -102,26 +103,14 @@ export default function VeterinarianAppointmentList({
       setLoading(appointmentId);
       setError(null);
 
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: 'accepted'
-        }),
+      const appointment = await appointmentService.updateAppointment(appointmentId, {
+        status: 'accepted'
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess('Appointment accepted successfully');
-        onAppointmentUpdated(data.appointment);
-      } else {
-        setError(data.error || 'Failed to accept appointment');
-      }
+      setSuccess('Appointment accepted successfully');
+      onAppointmentUpdated(appointment);
     } catch (err) {
-      setError('Failed to accept appointment');
+      setError(err instanceof Error ? err.message : 'Failed to accept appointment');
       console.error('Error accepting appointment:', err);
     } finally {
       setLoading(null);
@@ -138,29 +127,17 @@ export default function VeterinarianAppointmentList({
       setLoading(appointmentId);
       setError(null);
 
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: 'rejected',
-          reschedule_reason: rejectReason
-        }),
+      const appointment = await appointmentService.updateAppointment(appointmentId, {
+        status: 'rejected',
+        reschedule_reason: rejectReason
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess('Appointment rejected successfully');
-        onAppointmentUpdated(data.appointment);
-        setShowRejectModal(null);
-        setRejectReason('');
-      } else {
-        setError(data.error || 'Failed to reject appointment');
-      }
+      setSuccess('Appointment rejected successfully');
+      onAppointmentUpdated(appointment);
+      setShowRejectModal(null);
+      setRejectReason('');
     } catch (err) {
-      setError('Failed to reject appointment');
+      setError(err instanceof Error ? err.message : 'Failed to reject appointment');
       console.error('Error rejecting appointment:', err);
     } finally {
       setLoading(null);
@@ -172,26 +149,14 @@ export default function VeterinarianAppointmentList({
       setLoading(appointmentId);
       setError(null);
 
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: 'completed'
-        }),
+      const appointment = await appointmentService.updateAppointment(appointmentId, {
+        status: 'completed'
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess('Appointment marked as completed');
-        onAppointmentUpdated(data.appointment);
-      } else {
-        setError(data.error || 'Failed to complete appointment');
-      }
+      setSuccess('Appointment marked as completed');
+      onAppointmentUpdated(appointment);
     } catch (err) {
-      setError('Failed to complete appointment');
+      setError(err instanceof Error ? err.message : 'Failed to complete appointment');
       console.error('Error completing appointment:', err);
     } finally {
       setLoading(null);

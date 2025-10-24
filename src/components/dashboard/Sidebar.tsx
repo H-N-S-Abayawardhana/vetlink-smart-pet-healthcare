@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/components/providers/AuthProvider';
 import {
   HomeIcon,
   HeartIcon,
@@ -18,7 +18,6 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { getAllowedNavigationItems } from '@/lib/rbac';
-import { UserRole } from '@/types/next-auth';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -40,10 +39,10 @@ const iconMap = {
 
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { user } = useAuth();
   
-  // Get user role from session
-  const userRole = (session?.user as any)?.userRole as UserRole || 'USER';
+  // Get user role from user context
+  const userRole = user?.user_role || 'USER';
   
   // Get allowed navigation items based on user role
   const allowedNavigationItems = getAllowedNavigationItems(userRole);
@@ -121,14 +120,13 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                 <span className="text-sm font-medium text-blue-600">
-                  {(session?.user as any)?.username?.charAt(0).toUpperCase() || 
-                   session?.user?.name?.charAt(0).toUpperCase() || 'U'}
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-900">
-                {(session?.user as any)?.username || session?.user?.name || 'User'}
+                {user?.username || 'User'}
               </p>
               <p className="text-xs text-gray-500">
                 {userRole === 'SUPER_ADMIN' ? 'Super Admin' : 

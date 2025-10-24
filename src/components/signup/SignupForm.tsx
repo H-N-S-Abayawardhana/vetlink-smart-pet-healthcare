@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Alert from "@/components/ui/Alert";
 import Link from "next/link";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function SignupForm() {
   const router = useRouter();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -94,28 +95,16 @@ export default function SignupForm() {
     setIsLoading(true);
 
     try {
-      // Create user account
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          contactNumber: formData.contactNumber,
-          password: formData.password,
-        }),
+      // Create user account and automatically log in
+      await register({
+        username: formData.username,
+        email: formData.email,
+        contact_number: formData.contactNumber,
+        password: formData.password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Signup failed');
-      }
-
-      // Navigate to signin page after successful signup
-      router.push('/signin?message=Account created successfully. Please sign in.');
+      // Navigate to dashboard after successful registration and login
+      router.push('/dashboard');
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'An error occurred during signup');
     } finally {
@@ -125,11 +114,7 @@ export default function SignupForm() {
 
   const handleGoogleSignUp = async () => {
     setSubmitError("");
-    try {
-      await signIn('google', { callbackUrl: '/dashboard' });
-    } catch (error) {
-      setSubmitError('An error occurred during Google sign up');
-    }
+    setSubmitError('Google sign-up is not available with the new authentication system. Please use email and password.');
   };
 
   return (

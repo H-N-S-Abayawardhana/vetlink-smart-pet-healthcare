@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Alert from '@/components/ui/Alert';
-import { AuthGuard } from '@/lib/auth-guard';
-import { UserRole } from '@/types/next-auth';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { profileService } from '@/lib';
 
 // Force dynamic rendering to prevent SSR issues
 export const dynamic = 'force-dynamic';
@@ -17,7 +16,7 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
-  const { data: session, update } = useSession();
+  const { user, updateUser } = useAuth();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,14 +33,14 @@ export default function ProfilePage() {
   }
 
   useEffect(() => {
-    if (session?.user) {
+    if (user) {
       setFormData({
-        username: (session.user as any).username || '',
-        email: session.user.email || '',
-        contactNumber: (session.user as any).contactNumber || ''
+        username: user.username || '',
+        email: user.email || '',
+        contactNumber: user.contact_number || ''
       });
     }
-  }, [session]);
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,44 +56,39 @@ export default function ProfilePage() {
     setAlert(null);
 
     try {
-      const response = await fetch('/api/profile/update', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      const updatedUser = await profileService.updateProfile({
+        username: formData.username,
+        email: formData.email,
+        contact_number: formData.contactNumber
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        setAlert({ type: 'success', message: 'Profile updated successfully!' });
-        setIsEditing(false);
-        // Update the session with new data
-        await update();
-      } else {
-        setAlert({ type: 'error', message: result.message || 'Failed to update profile' });
-      }
+      setAlert({ type: 'success', message: 'Profile updated successfully!' });
+      setIsEditing(false);
+      // Update the user context with new data
+      updateUser(updatedUser);
     } catch (error) {
-      setAlert({ type: 'error', message: 'An error occurred while updating your profile' });
+      setAlert({ 
+        type: 'error', 
+        message: error instanceof Error ? error.message : 'An error occurred while updating your profile' 
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    if (session?.user) {
+    if (user) {
       setFormData({
-        username: (session.user as any).username || '',
-        email: session.user.email || '',
-        contactNumber: (session.user as any).contactNumber || ''
+        username: user.username || '',
+        email: user.email || '',
+        contactNumber: user.contact_number || ''
       });
     }
     setIsEditing(false);
     setAlert(null);
   };
 
-  if (!session) {
+  if (!user) {
     router.push('/signin');
     return null;
   }
@@ -110,8 +104,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <AuthGuard allowedRoles={['SUPER_ADMIN', 'VETERINARIAN']}>
-      <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
         <div className="bg-white shadow-sm rounded-lg">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200">
@@ -229,14 +222,14 @@ export default function ProfilePage() {
               <div className="flex items-center space-x-4">
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="text-2xl font-semibold text-blue-600">
-                    {(session.user as any).username?.charAt(0).toUpperCase() || session.user.name?.charAt(0).toUpperCase() || 'U'}
+                    {user.username?.charAt(0).toUpperCase() || 'U'}
                   </span>
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">
-                    {(session.user as any).username || session.user.name}
+                    {user.username}
                   </h2>
-                  <p className="text-sm text-gray-600">{session.user.email}</p>
+                  <p className="text-sm text-gray-600">{user.email}</p>
                 </div>
               </div>
 
@@ -244,31 +237,31 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Username</h3>
-                  <p className="text-lg text-gray-900">{(session.user as any).username || 'Not set'}</p>
+                  <p className="text-lg text-gray-900">{user.username || 'Not set'}</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Email Address</h3>
-                  <p className="text-lg text-gray-900">{session.user.email}</p>
+                  <p className="text-lg text-gray-900">{user.email}</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Contact Number</h3>
-                  <p className="text-lg text-gray-900">{(session.user as any).contactNumber || 'Not provided'}</p>
+                  <p className="text-lg text-gray-900">{user.contact_number || 'Not provided'}</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Member Since</h3>
                   <p className="text-lg text-gray-900">
-                    {formatDate((session.user as any).createdAt)}
+                    {formatDate(user.created_at)}
                   </p>
                 </div>
 
-                {(session.user as any).lastLogin && (
+                {user.last_login && (
                   <div className="bg-gray-50 rounded-lg p-4 sm:col-span-2">
                     <h3 className="text-sm font-medium text-gray-500 mb-2">Last Login</h3>
                     <p className="text-lg text-gray-900">
-                      {formatDate((session.user as any).lastLogin)}
+                      {formatDate(user.last_login)}
                     </p>
                   </div>
                 )}
@@ -278,6 +271,5 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
-    </AuthGuard>
   );
 }

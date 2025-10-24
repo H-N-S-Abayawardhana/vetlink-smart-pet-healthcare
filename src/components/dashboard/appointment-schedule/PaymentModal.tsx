@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Alert from '@/components/ui/Alert';
+import { appointmentService } from '@/lib';
 
 interface Appointment {
   id: number;
@@ -45,31 +46,22 @@ export default function PaymentModal({ appointment, isOpen, onClose, onPaymentSu
         cardholderName
       };
 
-      const response = await fetch(`/api/appointments/${appointment.id}/payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          payment_method: paymentMethod,
-          amount: consultationFee,
-          payment_details: paymentDetails
-        }),
+      await appointmentService.processPayment(appointment.id, {
+        payment_method: paymentMethod,
+        amount: consultationFee,
+        payment_details: paymentDetails
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setAlert({ type: 'success', message: 'Payment processed successfully!' });
-        setTimeout(() => {
-          onPaymentSuccess();
-          onClose();
-        }, 2000);
-      } else {
-        setAlert({ type: 'error', message: data.error || 'Payment failed' });
-      }
+      setAlert({ type: 'success', message: 'Payment processed successfully!' });
+      setTimeout(() => {
+        onPaymentSuccess();
+        onClose();
+      }, 2000);
     } catch (error) {
-      setAlert({ type: 'error', message: 'An error occurred while processing payment' });
+      setAlert({ 
+        type: 'error', 
+        message: error instanceof Error ? error.message : 'An error occurred while processing payment' 
+      });
     } finally {
       setIsProcessing(false);
     }

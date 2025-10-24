@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Alert from '@/components/ui/Alert';
 import PaymentModal from './PaymentModal';
+import { appointmentService } from '@/lib';
 
 interface Appointment {
   id: number;
@@ -101,20 +102,11 @@ export default function AppointmentList({
       setLoading(appointmentId);
       setError(null);
 
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess('Appointment cancelled successfully');
-        onAppointmentCancelled(appointmentId);
-      } else {
-        setError(data.error || 'Failed to cancel appointment');
-      }
+      await appointmentService.cancelAppointment(appointmentId);
+      setSuccess('Appointment cancelled successfully');
+      onAppointmentCancelled(appointmentId);
     } catch (err) {
-      setError('Failed to cancel appointment');
+      setError(err instanceof Error ? err.message : 'Failed to cancel appointment');
       console.error('Error cancelling appointment:', err);
     } finally {
       setLoading(null);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Alert from '@/components/ui/Alert';
+import { veterinarianService, appointmentService } from '@/lib';
 
 interface Veterinarian {
   id: number;
@@ -53,14 +54,8 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
 
   const fetchVeterinarians = async () => {
     try {
-      const response = await fetch('/api/veterinarians');
-      const data = await response.json();
-
-      if (data.success) {
-        setVeterinarians(data.veterinarians);
-      } else {
-        setError(data.error || 'Failed to fetch veterinarians');
-      }
+      const data = await veterinarianService.getVeterinarians();
+      setVeterinarians(data.veterinarians);
     } catch (err) {
       setError('Failed to fetch veterinarians');
       console.error('Error fetching veterinarians:', err);
@@ -72,17 +67,8 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
 
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/veterinarians/${selectedVet}/availability?date=${selectedDate}`
-      );
-      const data = await response.json();
-
-      if (data.success) {
-        setTimeSlots(data.available_slots);
-      } else {
-        setError(data.error || 'Failed to fetch availability');
-        setTimeSlots([]);
-      }
+      const data = await veterinarianService.getVeterinarianAvailability(selectedVet, selectedDate);
+      setTimeSlots(data.available_slots);
     } catch (err) {
       setError('Failed to fetch availability');
       setTimeSlots([]);
@@ -104,36 +90,24 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/appointments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          veterinarian_id: selectedVet,
-          appointment_date: selectedDate,
-          appointment_time: selectedTime,
-          reason: reason.trim() || null,
-        }),
+      const appointment = await appointmentService.createAppointment({
+        veterinarian_id: selectedVet,
+        appointment_date: selectedDate,
+        appointment_time: selectedTime,
+        reason: reason.trim() || undefined,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess('Appointment scheduled successfully!');
-        onAppointmentCreated(data.appointment);
-        
-        // Reset form
-        setSelectedVet(null);
-        setSelectedDate('');
-        setSelectedTime('');
-        setReason('');
-        setTimeSlots([]);
-      } else {
-        setError(data.error || 'Failed to schedule appointment');
-      }
+      setSuccess('Appointment scheduled successfully!');
+      onAppointmentCreated(appointment);
+      
+      // Reset form
+      setSelectedVet(null);
+      setSelectedDate('');
+      setSelectedTime('');
+      setReason('');
+      setTimeSlots([]);
     } catch (err) {
-      setError('Failed to schedule appointment');
+      setError(err instanceof Error ? err.message : 'Failed to schedule appointment');
       console.error('Error scheduling appointment:', err);
     } finally {
       setLoading(false);
