@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ImageUpload from './ImageUpload';
-import { createPet, getPet, updatePet, Pet } from '@/lib/pets';
+import { createPet, getPet, updatePet, uploadAvatar, Pet } from '@/lib/pets';
 import { useRouter } from 'next/navigation';
 
 interface PetFormProps {
@@ -57,15 +57,26 @@ export default function PetForm({ petId }: PetFormProps) {
     if (!validate()) return;
     setLoading(true);
     try {
+      // If an avatar is provided as data URL, upload it first to get a hosted URL
+      if (form.avatarDataUrl && petId) {
+        const uploaded = await uploadAvatar(petId, form.avatarDataUrl);
+        if (uploaded) form.avatarDataUrl = uploaded as any;
+      }
+
       if (petId) {
         await updatePet(petId, form as Partial<Pet>);
+        router.push('/dashboard/pets');
       } else {
+        // Create then upload avatar (create returns id)
         const created = await createPet(form as Partial<Pet>);
-        // navigate to edit/view after creation
+        if (created && form.avatarDataUrl) {
+          const uploaded = await uploadAvatar(created.id, form.avatarDataUrl);
+          if (uploaded) {
+            await updatePet(created.id, { avatarDataUrl: uploaded as any });
+          }
+        }
         router.push(`/dashboard/pets/${created.id}`);
       }
-      // on success, navigate back to pets list
-      if (petId) router.push('/dashboard/pets');
     } catch (err) {
       console.error(err);
     } finally {

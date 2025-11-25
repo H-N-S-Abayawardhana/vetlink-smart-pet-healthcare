@@ -3,14 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PetCard from '@/components/dashboard/pets/PetCard';
-import { listPets, seedSampleDog, Pet } from '@/lib/pets';
+import { listPets, Pet } from '@/lib/pets';
 
 export default function PetsPage() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    seedSampleDog();
     (async () => {
       const data = await listPets();
       setPets(data.filter(p => p.type === 'dog'));
