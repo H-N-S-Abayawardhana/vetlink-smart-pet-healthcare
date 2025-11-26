@@ -19,9 +19,9 @@ export default function PetForm({ petId }: PetFormProps) {
     name: '',
     breed: '',
     weightKg: null,
-    activityLevel: 'Medium',
+    activityLevel: undefined,
     ageYears: null,
-    gender: 'Male',
+    gender: undefined,
     allergies: [],
     preferredDiet: '',
     healthNotes: '',
@@ -118,7 +118,8 @@ export default function PetForm({ petId }: PetFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">Activity Level</label>
-              <select value={form.activityLevel} onChange={(e) => handleChange('activityLevel', e.target.value)} className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <select value={form.activityLevel || ''} onChange={(e) => handleChange('activityLevel', e.target.value)} className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select activity level</option>
                 <option>Low</option>
                 <option>Medium</option>
                 <option>High</option>
@@ -135,7 +136,8 @@ export default function PetForm({ petId }: PetFormProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">Gender</label>
-              <select value={form.gender || 'Male'} onChange={(e) => handleChange('gender', e.target.value)} className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <select value={form.gender || ''} onChange={(e) => handleChange('gender', e.target.value)} className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select gender</option>
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
