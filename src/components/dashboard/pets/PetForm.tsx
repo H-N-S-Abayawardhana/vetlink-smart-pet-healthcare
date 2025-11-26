@@ -33,7 +33,14 @@ export default function PetForm({ petId }: PetFormProps) {
     if (petId) {
       (async () => {
         const pet = await getPet(petId);
-        if (pet) setForm(pet);
+        if (pet) {
+          // Normalize backend `avatarUrl` -> frontend `avatarDataUrl` so ImageUpload shows the image
+          const normalized = {
+            ...pet,
+            avatarDataUrl: (pet as any).avatarDataUrl || (pet as any).avatarUrl || null,
+          } as Partial<Pet>;
+          setForm(normalized);
+        }
       })();
     }
   }, [petId]);

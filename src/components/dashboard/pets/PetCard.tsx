@@ -12,11 +12,8 @@ export default function PetCard({ pet }: PetCardProps) {
   return (
     <div className="bg-white rounded-lg shadow border border-gray-200 p-4 flex items-center space-x-4">
       <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-        {pet.avatarDataUrl ? (
-          // Using next/image for potential optimization; if data URL it still works
-          // keep styling consistent with other avatar usage in the project
-          // fall back to emoji when unavailable
-          <img src={pet.avatarDataUrl} alt={`${pet.name} avatar`} className="w-full h-full object-cover" />
+        { (pet as any).avatarDataUrl || (pet as any).avatarUrl ? (
+          <img src={(pet as any).avatarDataUrl || (pet as any).avatarUrl} alt={`${pet.name} photo`} className="w-full h-full object-cover" />
         ) : (
           <span className="text-xl">🐕</span>
         )}
