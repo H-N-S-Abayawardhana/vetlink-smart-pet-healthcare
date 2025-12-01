@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: { params: any }) {
     const pet = mapRowToPet(petRow);
     // Authorization: owner or vet/admin can view
     const userRole = (session.user as any)?.userRole;
-    if (pet.owner_id !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+    if (pet.ownerId !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -52,7 +52,7 @@ export async function PUT(request: NextRequest, { params }: { params: any }) {
     const petRow = result.rows[0];
     const pet = mapRowToPet(petRow);
     const userRole = (session.user as any)?.userRole;
-    if (pet.owner_id !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+    if (pet.ownerId !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

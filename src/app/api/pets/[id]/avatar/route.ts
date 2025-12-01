@@ -5,14 +5,14 @@ import fs from 'fs';
 import path from 'path';
 
 // POST /api/pets/:id/avatar
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> } ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const { id } = params;
+    const { params } = context;
+    const { id } = (await params) as { id: string };
     const body = await request.json();
     const { dataUrl } = body;
     if (!dataUrl || typeof dataUrl !== 'string') {
