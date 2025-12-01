@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ImageUpload from './ImageUpload';
-import { createPet, getPet, updatePet, uploadAvatar, Pet } from '@/lib/pets';
+import { createPet, getPet, updatePet, uploadAvatar, deletePet, Pet } from '@/lib/pets';
 import { useRouter } from 'next/navigation';
 
 interface PetFormProps {
@@ -250,6 +250,29 @@ export default function PetForm({ petId }: PetFormProps) {
               {loading ? 'Saving...' : petId ? 'Save Changes' : 'Create Pet'}
             </button>
             <button type="button" onClick={() => router.push('/dashboard/pets')} className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+            {petId && (
+              <button
+                type="button"
+                onClick={async () => {
+                  const confirmed = confirm('Are you sure you want to delete this pet? This action cannot be undone.');
+                  if (!confirmed) return;
+                  setLoading(true);
+                  try {
+                    const ok = await deletePet(petId);
+                    if (ok) router.push('/dashboard/pets');
+                    else alert('Failed to delete pet');
+                  } catch (err) {
+                    console.error(err);
+                    alert('An error occurred while deleting the pet');
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Delete
+              </button>
+            )}
           </div>
         </div>
       </div>
