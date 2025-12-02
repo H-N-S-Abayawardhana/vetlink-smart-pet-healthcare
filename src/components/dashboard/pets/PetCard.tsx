@@ -8,34 +8,8 @@ interface PetCardProps {
   pet: Pet;
 }
 
-// Get species-specific emoji and gradient
-const getSpeciesStyle = (species?: string) => {
-  const speciesLower = species?.toLowerCase() || '';
-  if (speciesLower.includes('cat')) {
-    return { emoji: '🐱', gradient: 'from-purple-500 to-pink-500', bg: 'bg-purple-50', ring: 'ring-purple-200' };
-  }
-  if (speciesLower.includes('bird')) {
-    return { emoji: '🦜', gradient: 'from-yellow-400 to-orange-500', bg: 'bg-yellow-50', ring: 'ring-yellow-200' };
-  }
-  if (speciesLower.includes('rabbit') || speciesLower.includes('bunny')) {
-    return { emoji: '🐰', gradient: 'from-pink-400 to-rose-500', bg: 'bg-pink-50', ring: 'ring-pink-200' };
-  }
-  if (speciesLower.includes('hamster') || speciesLower.includes('guinea')) {
-    return { emoji: '🐹', gradient: 'from-amber-400 to-orange-400', bg: 'bg-amber-50', ring: 'ring-amber-200' };
-  }
-  if (speciesLower.includes('fish')) {
-    return { emoji: '🐠', gradient: 'from-cyan-400 to-blue-500', bg: 'bg-cyan-50', ring: 'ring-cyan-200' };
-  }
-  if (speciesLower.includes('turtle') || speciesLower.includes('tortoise')) {
-    return { emoji: '🐢', gradient: 'from-green-400 to-emerald-500', bg: 'bg-green-50', ring: 'ring-green-200' };
-  }
-  // Default: dog
-  return { emoji: '🐕', gradient: 'from-blue-500 to-indigo-500', bg: 'bg-blue-50', ring: 'ring-blue-200' };
-};
-
 export default function PetCard({ pet }: PetCardProps) {
   const router = useRouter();
-  const speciesStyle = getSpeciesStyle((pet as any).species);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -54,12 +28,12 @@ export default function PetCard({ pet }: PetCardProps) {
     >
       <div className="relative overflow-hidden bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300">
         {/* Decorative gradient bar at top */}
-        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${speciesStyle.gradient}`} />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
         
         <div className="p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4">
           {/* Avatar Section */}
           <div className="relative flex-shrink-0">
-            <div className={`w-20 h-20 sm:w-18 sm:h-18 rounded-2xl overflow-hidden ${speciesStyle.bg} flex items-center justify-center ring-2 ${speciesStyle.ring} shadow-md group-hover:shadow-lg transition-shadow duration-300`}>
+            <div className="w-20 h-20 sm:w-18 sm:h-18 rounded-2xl overflow-hidden bg-blue-50 flex items-center justify-center ring-2 ring-blue-200 shadow-md group-hover:shadow-lg transition-shadow duration-300">
               {(pet as any).avatarDataUrl || (pet as any).avatarUrl ? (
                 <img 
                   src={(pet as any).avatarDataUrl || (pet as any).avatarUrl} 
@@ -67,11 +41,11 @@ export default function PetCard({ pet }: PetCardProps) {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" 
                 />
               ) : (
-                <span className="text-4xl transform group-hover:scale-110 transition-transform duration-300">{speciesStyle.emoji}</span>
+                <span className="text-4xl transform group-hover:scale-110 transition-transform duration-300">🐕</span>
               )}
             </div>
             {/* Status indicator dot */}
-            <div className={`absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br ${speciesStyle.gradient} rounded-full border-2 border-white shadow-sm flex items-center justify-center`}>
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full border-2 border-white shadow-sm flex items-center justify-center">
               <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
@@ -114,7 +88,7 @@ export default function PetCard({ pet }: PetCardProps) {
                   Edit
                 </Link>
 
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${speciesStyle.gradient} flex items-center justify-center transform group-hover:translate-x-1 transition-transform duration-300 shadow-md`}>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center transform group-hover:translate-x-1 transition-transform duration-300 shadow-md">
                   <svg className="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
