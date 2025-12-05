@@ -1,6 +1,7 @@
 // src/services/mlApi.ts
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_ML_API_URL || 'http://localhost:5000';
+// Use Hugging Face Spaces URL instead of localhost
+const API_BASE_URL = process.env.NEXT_PUBLIC_ML_API_URL || 'https://niwarthana-skin-disease-detection-of-dogs.hf.space';
 
 export interface PredictionResult {
   success: boolean;
@@ -9,6 +10,7 @@ export interface PredictionResult {
     confidence: number;
     all_probabilities: Record<string, number>;
   };
+  model_type?: string;
 }
 
 export interface HealthCheckResult {
@@ -17,7 +19,7 @@ export interface HealthCheckResult {
   device: string;
   num_classes: number;
   classes: string[];
-  architecture: string;
+  model_type?: string;
   error?: string;
 }
 
@@ -30,7 +32,7 @@ export class MLApiService {
       const formData = new FormData();
       formData.append('image', file);
 
-      const response = await fetch(`${API_BASE_URL}/predict`, {
+      const response = await fetch(`${API_BASE_URL}/predict/`, {
         method: 'POST',
         body: formData,
       });
@@ -53,7 +55,7 @@ export class MLApiService {
    */
   static async predictFromBase64(base64Image: string): Promise<PredictionResult> {
     try {
-      const response = await fetch(`${API_BASE_URL}/predict-base64`, {
+      const response = await fetch(`${API_BASE_URL}/predict-base64/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +81,7 @@ export class MLApiService {
    */
   static async healthCheck(): Promise<HealthCheckResult> {
     try {
-      const response = await fetch(`${API_BASE_URL}/health`);
+      const response = await fetch(`${API_BASE_URL}/health/`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -95,7 +97,7 @@ export class MLApiService {
         device: 'unknown',
         num_classes: 0,
         classes: [],
-        architecture: 'unknown',
+        model_type: 'unknown',
         error: error instanceof Error ? error.message : 'Unknown error'
       };
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MLApiService, { PredictionResult } from '@/services/mlApi';
 import ImageUpload from './ImageUpload';
 import CameraCapture from './CameraCapture';
@@ -11,6 +11,26 @@ export default function SkinAnalysis() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'camera'>('upload');
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+
+  // Check API health on component mount
+  useEffect(() => {
+    checkApiHealth();
+  }, []);
+
+  const checkApiHealth = async () => {
+    setApiStatus('checking');
+    try {
+      const health = await MLApiService.healthCheck();
+      if (health.status === 'healthy' && health.model_loaded) {
+        setApiStatus('online');
+      } else {
+        setApiStatus('offline');
+      }
+    } catch {
+      setApiStatus('offline');
+    }
+  };
 
   const handleFileUpload = async (file: File) => {
     setError(null);
@@ -32,7 +52,7 @@ export default function SkinAnalysis() {
       setError(
         err instanceof Error 
           ? err.message 
-          : 'Failed to analyze image. Please ensure the backend server is running at http://localhost:5000'
+          : 'Failed to analyze image. Please try again or check your internet connection.'
       );
       console.error('Prediction error:', err);
     } finally {
@@ -60,7 +80,7 @@ export default function SkinAnalysis() {
       setError(
         err instanceof Error 
           ? err.message 
-          : 'Failed to analyze image. Please ensure the backend server is running at http://localhost:5000'
+          : 'Failed to analyze image. Please try again or check your internet connection.'
       );
       console.error('Prediction error:', err);
     } finally {
@@ -75,7 +95,6 @@ export default function SkinAnalysis() {
     setLoading(false);
   };
 
-  // Format disease name for display
   const formatDiseaseName = (disease: string) => {
     return disease
       .split('_')
@@ -85,15 +104,53 @@ export default function SkinAnalysis() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
-      {/* Header */}
+      {/* Header with API Status */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          🐕 Dog Skin Disease Detection
-        </h1>
-        <p className="text-gray-600">
-          Upload an image or use your camera to detect skin conditions using AI-powered analysis
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              🐕 Dog Skin Disease Detection
+            </h1>
+            <p className="text-gray-600">
+              Upload an image or use your camera to detect skin conditions using AI-powered analysis
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${
+              apiStatus === 'online' ? 'bg-green-500' :
+              apiStatus === 'offline' ? 'bg-red-500' :
+              'bg-yellow-500 animate-pulse'
+            }`} />
+            <span className="text-sm text-gray-600">
+              {apiStatus === 'online' ? 'API Online' :
+               apiStatus === 'offline' ? 'API Offline' :
+               'Checking...'}
+            </span>
+          </div>
+        </div>
       </div>
+
+      {/* API Offline Warning */}
+      {apiStatus === 'offline' && (
+        <div className="bg-orange-50 border-l-4 border-orange-400 rounded-lg p-4">
+          <div className="flex">
+            <svg className="w-6 h-6 text-orange-400 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-orange-800">
+                The ML API is currently unavailable. The Hugging Face Space may be sleeping.
+              </p>
+              <button
+                onClick={checkApiHealth}
+                className="mt-2 text-sm text-orange-700 hover:text-orange-900 underline"
+              >
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       {!selectedImage && (
@@ -162,7 +219,7 @@ export default function SkinAnalysis() {
                 Analyzing image with AI model...
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                DINOv2 + ViT is processing your image
+                Using ViT-B/16 model on Hugging Face Spaces
               </p>
             </div>
           )}
@@ -188,11 +245,11 @@ export default function SkinAnalysis() {
                   <h3 className="text-lg font-medium text-red-800">Analysis Failed</h3>
                   <p className="text-sm text-red-700 mt-1">{error}</p>
                   <div className="mt-4">
-                    <p className="text-sm font-medium text-red-800 mb-2">Troubleshooting:</p>
+                    <p className="text-sm font-medium text-red-800 mb-2">Possible causes:</p>
                     <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
-                      <li>Make sure the backend server is running (python app.py)</li>
-                      <li>Check that it's accessible at http://localhost:5000</li>
-                      <li>Verify the model loaded successfully in the backend</li>
+                      <li>The Hugging Face Space may be sleeping (first request takes longer)</li>
+                      <li>Check your internet connection</li>
+                      <li>Try uploading a different image</li>
                     </ul>
                   </div>
                 </div>
