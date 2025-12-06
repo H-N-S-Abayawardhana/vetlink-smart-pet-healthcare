@@ -196,13 +196,15 @@ export default function NavBar({ onMenuClick }: NavBarProps) {
                     </p>
                   </div>
                   
-                  {/* Profile link for all roles */}
-                  <a
-                    href="/dashboard/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Your Profile
-                  </a>
+                  {/* Role-specific menu items */}
+                  {(userRole === 'SUPER_ADMIN' || userRole === 'VETERINARIAN') && (
+                    <a
+                      href="/dashboard/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Your Profile
+                    </a>
+                  )}
                   
                   {userRole === 'SUPER_ADMIN' && (
                     <a
