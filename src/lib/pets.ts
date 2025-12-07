@@ -9,6 +9,7 @@ export type ActivityLevel = 'Low' | 'Medium' | 'High';
 
 export interface Pet {
   id: string;
+  ownerId?: string | null; // Owner's user ID
   type: 'dog' | 'cat' | 'other';
   name: string;
   breed?: string;

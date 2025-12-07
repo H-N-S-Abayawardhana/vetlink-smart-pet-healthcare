@@ -19,8 +19,10 @@ export async function GET(request: NextRequest, { params }: { params: any }) {
     const pet = mapRowToPet(petRow);
 
     // Authorization: owner or vet/admin
+    // Cast owner_id to text to match UUID string from session
     const userRole = (session.user as any)?.userRole;
-    if (pet.ownerId !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+    const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
+    if (ownerIdStr !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

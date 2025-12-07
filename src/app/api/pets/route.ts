@@ -30,13 +30,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Regular users: only their pets (optionally filter by type)
+    // Cast owner_id to text to match UUID string from session
     if (typeFilter) {
-      const result = await pool.query('SELECT * FROM pets WHERE owner_id = $1 AND type = $2 ORDER BY created_at DESC', [session.user.id, typeFilter]);
+      const result = await pool.query('SELECT * FROM pets WHERE owner_id::text = $1 AND type = $2 ORDER BY created_at DESC', [session.user.id, typeFilter]);
       const pets = result.rows.map(mapRowToPet);
       return NextResponse.json({ pets });
     }
 
-    const result = await pool.query('SELECT * FROM pets WHERE owner_id = $1 ORDER BY created_at DESC', [session.user.id]);
+    const result = await pool.query('SELECT * FROM pets WHERE owner_id::text = $1 ORDER BY created_at DESC', [session.user.id]);
     const pets = result.rows.map(mapRowToPet);
     return NextResponse.json({ pets });
   } catch (error) {
@@ -51,6 +52,12 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Only USER role can add pets
+    const userRole = (session.user as any)?.userRole as UserRole || 'USER';
+    if (userRole !== 'USER') {
+      return NextResponse.json({ error: 'Only regular users can add pets' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -73,9 +80,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
+    // Insert pet with owner_id - session.user.id is UUID string
+    // If owner_id column is UUID, PostgreSQL will handle the conversion
+    // If owner_id is still BIGINT, you need to run the migration script first
     const result = await pool.query(
       `INSERT INTO pets (owner_id, type, name, breed, weight_kg, activity_level, age_years, gender, allergies, preferred_diet, health_notes, vaccination_status, avatar_url, created_at, updated_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+       VALUES ($1::uuid,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
        RETURNING *`,
       [
         session.user.id,

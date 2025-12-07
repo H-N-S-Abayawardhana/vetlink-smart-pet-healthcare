@@ -21,8 +21,10 @@ export async function GET(request: NextRequest, { params }: { params: any }) {
     const petRow = result.rows[0];
     const pet = mapRowToPet(petRow);
     // Authorization: owner or vet/admin can view
+    // Cast owner_id to text to match UUID string from session
     const userRole = (session.user as any)?.userRole;
-    if (pet.ownerId !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+    const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
+    if (ownerIdStr !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -52,7 +54,9 @@ export async function PUT(request: NextRequest, { params }: { params: any }) {
     const petRow = result.rows[0];
     const pet = mapRowToPet(petRow);
     const userRole = (session.user as any)?.userRole;
-    if (pet.ownerId !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+    // Cast owner_id to text to match UUID string from session
+    const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
+    if (ownerIdStr !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -116,7 +120,9 @@ export async function DELETE(request: NextRequest, { params }: { params: any }) 
 
     const pet = result.rows[0];
     const userRole = (session.user as any)?.userRole;
-    if (pet.owner_id !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+    // Cast owner_id to text to match UUID string from session
+    const ownerIdStr = pet.owner_id ? String(pet.owner_id) : null;
+    if (ownerIdStr !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -146,7 +152,9 @@ export async function PATCH(request: NextRequest, { params }: { params: any }) {
 
     const petRow = result.rows[0];
     const userRole = (session.user as any)?.userRole;
-    if (petRow.owner_id !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+    // Cast owner_id to text to match UUID string from session
+    const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
+    if (ownerIdStr !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
