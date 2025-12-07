@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import pool from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
 
@@ -13,13 +14,26 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     }
     const { params } = context;
     const { id } = (await params) as { id: string };
+    
+    // Validate owner or vet/admin - check pet ownership
+    const petResult = await pool.query('SELECT * FROM pets WHERE id = $1', [id]);
+    if (petResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Pet not found' }, { status: 404 });
+    }
+    
+    const petRow = petResult.rows[0];
+    const userRole = (session.user as any)?.userRole;
+    // Cast owner_id to text to match UUID string from session
+    const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
+    if (ownerIdStr !== session.user.id && userRole !== 'SUPER_ADMIN' && userRole !== 'VETERINARIAN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    
     const body = await request.json();
     const { dataUrl } = body;
     if (!dataUrl || typeof dataUrl !== 'string') {
       return NextResponse.json({ error: 'Invalid dataUrl' }, { status: 400 });
     }
-
-    // Validate owner or vet/admin - quick check by querying DB could be added.
 
     // Parse data URL: data:[<mediatype>][;base64],<data>
     const match = dataUrl.match(/^data:(image\/(png|jpeg|jpg|webp));base64,(.+)$/);

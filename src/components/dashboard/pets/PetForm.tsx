@@ -144,7 +144,8 @@ export default function PetForm({ petId }: PetFormProps) {
 
       if (petId) {
         await updatePet(petId, form as Partial<Pet>);
-        router.push('/dashboard/pets');
+        // Redirect to profile view after editing
+        router.push(`/dashboard/pets/${petId}`);
       } else {
         // Create then upload avatar (create returns id)
         const created = await createPet(form as Partial<Pet>);
@@ -154,7 +155,12 @@ export default function PetForm({ petId }: PetFormProps) {
             await updatePet(created.id, { avatarDataUrl: uploaded as any });
           }
         }
-        router.push('/dashboard/pets');
+        // Redirect to the new pet's profile
+        if (created) {
+          router.push(`/dashboard/pets/${created.id}`);
+        } else {
+          router.push('/dashboard/pets');
+        }
       }
     } catch (err) {
       console.error(err);
