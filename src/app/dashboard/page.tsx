@@ -21,6 +21,7 @@ export default function DashboardPage() {
     aiAnalyses: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [upcomingAppointments, setUpcomingAppointments] = useState<any[]>([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -29,24 +30,80 @@ export default function DashboardPage() {
   }, [status, router]);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/dashboard/stats");
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data.stats);
+        // Fetch stats
+        const statsResponse = await fetch("/api/dashboard/stats");
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          setStats(statsData.stats);
+        }
+
+        // Fetch upcoming appointments for all roles
+        const userRole = (session?.user as any)?.userRole || 'USER';
+        if (session) {
+          const appointmentsResponse = await fetch("/api/appointments");
+          if (appointmentsResponse.ok) {
+            const appointmentsData = await appointmentsResponse.json();
+            if (appointmentsData.success) {
+              // Filter and sort upcoming appointments (only future dates, pending or accepted status)
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              
+              const upcoming = appointmentsData.appointments
+                .filter((apt: any) => {
+                  // Parse date string directly to avoid timezone issues
+                  const dateStr = apt.appointment_date instanceof Date 
+                    ? apt.appointment_date.toISOString().split('T')[0]
+                    : typeof apt.appointment_date === 'string' && apt.appointment_date.includes('T')
+                    ? apt.appointment_date.split('T')[0]
+                    : apt.appointment_date;
+                  
+                  const dateParts = dateStr.split('-');
+                  if (dateParts.length !== 3) return false;
+                  
+                  const year = parseInt(dateParts[0], 10);
+                  const month = parseInt(dateParts[1], 10) - 1;
+                  const day = parseInt(dateParts[2], 10);
+                  const aptDate = new Date(year, month, day);
+                  aptDate.setHours(0, 0, 0, 0);
+                  
+                  return aptDate >= today && (apt.status === 'pending' || apt.status === 'accepted');
+                })
+                .sort((a: any, b: any) => {
+                  // Sort by date and time
+                  const dateStrA = a.appointment_date instanceof Date 
+                    ? a.appointment_date.toISOString().split('T')[0]
+                    : typeof a.appointment_date === 'string' && a.appointment_date.includes('T')
+                    ? a.appointment_date.split('T')[0]
+                    : a.appointment_date;
+                  const dateStrB = b.appointment_date instanceof Date 
+                    ? b.appointment_date.toISOString().split('T')[0]
+                    : typeof b.appointment_date === 'string' && b.appointment_date.includes('T')
+                    ? b.appointment_date.split('T')[0]
+                    : b.appointment_date;
+                  
+                  const dateA = new Date(`${dateStrA}T${a.appointment_time}`);
+                  const dateB = new Date(`${dateStrB}T${b.appointment_time}`);
+                  return dateA.getTime() - dateB.getTime();
+                })
+                .slice(0, 5); // Show only top 5 upcoming
+              
+              setUpcomingAppointments(upcoming);
+            }
+          }
         }
       } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
+        console.error("Error fetching dashboard data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (status === "authenticated") {
-      fetchStats();
+    if (status === "authenticated" && session) {
+      fetchData();
     }
-  }, [status]);
+  }, [status, session]);
 
   if (status === "loading" || loading) {
     return (
@@ -150,35 +207,75 @@ export default function DashboardPage() {
     },
   ];
 
-  const upcomingAppointments = [
-    {
-      id: 1,
-      petName: 'Buddy',
-      ownerName: 'Sarah Johnson',
-      time: '10:00 AM',
-      date: 'Today',
-      type: 'Regular Checkup',
-      status: 'confirmed',
-    },
-    {
-      id: 2,
-      petName: 'Luna',
-      ownerName: 'Mike Chen',
-      time: '2:00 PM',
-      date: 'Today',
-      type: 'Skin Analysis',
-      status: 'confirmed',
-    },
-    {
-      id: 3,
-      petName: 'Charlie',
-      ownerName: 'Emily Davis',
-      time: '4:30 PM',
-      date: 'Tomorrow',
-      type: 'Vaccination',
-      status: 'pending',
-    },
-  ];
+  // Format appointment date for display
+  const formatAppointmentDate = (dateString: string | Date) => {
+    try {
+      // Handle different date formats
+      let dateStr = '';
+      if (dateString instanceof Date) {
+        const year = dateString.getUTCFullYear();
+        const month = String(dateString.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(dateString.getUTCDate()).padStart(2, '0');
+        dateStr = `${year}-${month}-${day}`;
+      } else if (typeof dateString === 'string') {
+        if (dateString.includes('T')) {
+          dateStr = dateString.split('T')[0];
+        } else {
+          dateStr = dateString;
+        }
+      } else {
+        return '';
+      }
+      
+      // Parse date components directly
+      const dateParts = dateStr.split('-');
+      if (dateParts.length !== 3) {
+        return dateStr;
+      }
+      
+      const year = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10) - 1;
+      const day = parseInt(dateParts[2], 10);
+      
+      if (isNaN(year) || isNaN(month) || isNaN(day)) {
+        return dateStr;
+      }
+      
+      // Create date objects for comparison (using local time constructor)
+      const appointmentDate = new Date(year, month, day);
+      appointmentDate.setHours(0, 0, 0, 0);
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      if (appointmentDate.getTime() === today.getTime()) {
+        return 'Today';
+      } else if (appointmentDate.getTime() === tomorrow.getTime()) {
+        return 'Tomorrow';
+      } else {
+        return appointmentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }
+    } catch (error) {
+      if (typeof dateString === 'string') {
+        return dateString;
+      }
+      if (dateString instanceof Date) {
+        return dateString.toISOString().split('T')[0];
+      }
+      return '';
+    }
+  };
+
+  // Format time for display
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
 
   return (
     <div className="space-y-6">
@@ -290,46 +387,67 @@ export default function DashboardPage() {
               Upcoming Appointments
             </h3>
             <div className="space-y-4">
-              {upcomingAppointments.map((appointment) => (
-                <div key={appointment.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+              {upcomingAppointments.length > 0 ? (
+                upcomingAppointments.map((appointment) => (
+                  <div key={appointment.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {appointment.appointment_title || appointment.reason || 'Appointment'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {userRole === 'USER' 
+                            ? `Dr. ${appointment.veterinarian_name || 'Veterinarian'}`
+                            : userRole === 'VETERINARIAN'
+                            ? `${appointment.user_name || 'Pet Owner'}`
+                            : `${appointment.user_name || 'Pet Owner'} - Dr. ${appointment.veterinarian_name || 'Veterinarian'}`
+                          }
+                        </p>
                       </div>
                     </div>
-                    <div>
+                    <div className="text-right">
                       <p className="text-sm font-medium text-gray-900">
-                        {appointment.petName}
+                        {formatTime(appointment.appointment_time)}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {appointment.ownerName} • {appointment.type}
+                        {formatAppointmentDate(appointment.appointment_date)}
                       </p>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${
+                          appointment.status === 'accepted' || appointment.status === 'confirmed'
+                            ? 'bg-green-100 text-green-800'
+                            : appointment.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {appointment.status}
+                      </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
-                      {appointment.time}
-                    </p>
-                    <p className="text-sm text-gray-500">{appointment.date}</p>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        appointment.status === 'confirmed'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {appointment.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  No upcoming appointments
+                </p>
+              )}
             </div>
             <div className="mt-4">
               <a
-                href="/dashboard/appointments"
+                href={
+                  userRole === 'USER' 
+                    ? "/dashboard/appointment-schedule"
+                    : userRole === 'VETERINARIAN'
+                    ? "/dashboard/veterinarian-appointments"
+                    : "/dashboard/appointments"
+                }
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
                 View all appointments →

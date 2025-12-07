@@ -22,10 +22,12 @@ export async function GET(
     const result = await pool.query(
       `SELECT 
         a.id,
-        a.user_id,
-        a.veterinarian_id,
+        a.user_id_uuid as user_id,
+        a.veterinarian_id_uuid as veterinarian_id,
         a.appointment_date,
         a.appointment_time,
+        a.appointment_title,
+        a.contact_number,
         a.reason,
         a.status,
         a.reschedule_reason,
@@ -42,8 +44,8 @@ export async function GET(
         v.email as veterinarian_email,
         v.contact_number as veterinarian_contact
       FROM appointments a
-      JOIN users u ON a.user_id = u.id
-      JOIN users v ON a.veterinarian_id = v.id
+      JOIN users u ON a.user_id_uuid = u.id
+      JOIN users v ON a.veterinarian_id_uuid = v.id
       WHERE a.id = $1`,
       [appointmentId]
     );
@@ -60,8 +62,8 @@ export async function GET(
     // Check if user has access to this appointment
     const hasAccess = 
       session.user.userRole === 'SUPER_ADMIN' ||
-      (session.user.userRole === 'USER' && appointment.user_id === parseInt(session.user.id)) ||
-      (session.user.userRole === 'VETERINARIAN' && appointment.veterinarian_id === parseInt(session.user.id));
+      (session.user.userRole === 'USER' && appointment.user_id === session.user.id) ||
+      (session.user.userRole === 'VETERINARIAN' && appointment.veterinarian_id === session.user.id);
 
     if (!hasAccess) {
       return NextResponse.json(
@@ -70,9 +72,22 @@ export async function GET(
       );
     }
 
+    // Ensure dates are returned as strings to avoid timezone conversion issues
+    const formattedAppointment = {
+      ...appointment,
+      appointment_date: appointment.appointment_date instanceof Date 
+        ? appointment.appointment_date.toISOString().split('T')[0]
+        : typeof appointment.appointment_date === 'string' && appointment.appointment_date.includes('T')
+        ? appointment.appointment_date.split('T')[0]
+        : appointment.appointment_date,
+      appointment_time: typeof appointment.appointment_time === 'string' 
+        ? appointment.appointment_time 
+        : appointment.appointment_time?.toString() || ''
+    };
+
     return NextResponse.json({
       success: true,
-      appointment
+      appointment: formattedAppointment
     });
 
   } catch (error) {
@@ -122,14 +137,32 @@ export async function PUT(
     const currentAppointment = currentResult.rows[0];
 
     // Check if user has access to update this appointment
-    const hasAccess = 
-      session.user.userRole === 'SUPER_ADMIN' ||
-      (session.user.userRole === 'USER' && currentAppointment.user_id === parseInt(session.user.id)) ||
-      (session.user.userRole === 'VETERINARIAN' && currentAppointment.veterinarian_id === parseInt(session.user.id));
+    const isSuperAdmin = session.user.userRole === 'SUPER_ADMIN';
+    const isOwner = session.user.userRole === 'USER' && currentAppointment.user_id_uuid === session.user.id;
+    const isVeterinarian = session.user.userRole === 'VETERINARIAN' && currentAppointment.veterinarian_id_uuid === session.user.id;
+    const hasAccess = isSuperAdmin || isOwner || isVeterinarian;
 
     if (!hasAccess) {
       return NextResponse.json(
         { error: 'Access denied' },
+        { status: 403 }
+      );
+    }
+
+    // Role-based field restrictions
+    // Only VETERINARIANS and SUPER_ADMIN can change status (accept/reject)
+    if (status !== undefined && !isSuperAdmin && !isVeterinarian) {
+      return NextResponse.json(
+        { error: 'Only veterinarians can accept or reject appointments' },
+        { status: 403 }
+      );
+    }
+
+    // Only USER (owner) and SUPER_ADMIN can modify appointment details
+    // VETERINARIANS can only change status
+    if ((appointment_date !== undefined || appointment_time !== undefined || reason !== undefined) && !isSuperAdmin && !isOwner) {
+      return NextResponse.json(
+        { error: 'Only appointment owners can modify appointment details' },
         { status: 403 }
       );
     }
@@ -155,6 +188,15 @@ export async function PUT(
     }
 
     if (status !== undefined) {
+      // Validate status values
+      const validStatuses = ['pending', 'accepted', 'rejected', 'cancelled', 'rescheduled', 'completed'];
+      if (!validStatuses.includes(status)) {
+        return NextResponse.json(
+          { error: 'Invalid status value' },
+          { status: 400 }
+        );
+      }
+
       updates.push(`status = $${++paramCount}`);
       values.push(status);
       
@@ -193,12 +235,12 @@ export async function PUT(
         // Get user and veterinarian details for email notification
         const userResult = await pool.query(
           'SELECT username, email, contact_number FROM users WHERE id = $1',
-          [currentAppointment.user_id]
+          [currentAppointment.user_id_uuid]
         );
 
         const vetResult = await pool.query(
           'SELECT username, email, contact_number FROM users WHERE id = $1',
-          [currentAppointment.veterinarian_id]
+          [currentAppointment.veterinarian_id_uuid]
         );
 
         if (userResult.rows.length > 0 && vetResult.rows.length > 0) {
@@ -272,8 +314,8 @@ export async function DELETE(
     // Check if user has access to cancel this appointment
     const hasAccess = 
       session.user.userRole === 'SUPER_ADMIN' ||
-      (session.user.userRole === 'USER' && currentAppointment.user_id === parseInt(session.user.id)) ||
-      (session.user.userRole === 'VETERINARIAN' && currentAppointment.veterinarian_id === parseInt(session.user.id));
+      (session.user.userRole === 'USER' && currentAppointment.user_id_uuid === session.user.id) ||
+      (session.user.userRole === 'VETERINARIAN' && currentAppointment.veterinarian_id_uuid === session.user.id);
 
     if (!hasAccess) {
       return NextResponse.json(

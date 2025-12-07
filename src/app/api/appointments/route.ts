@@ -21,10 +21,12 @@ export async function GET(request: NextRequest) {
     let query = `
       SELECT 
         a.id,
-        a.user_id,
-        a.veterinarian_id,
+        a.user_id_uuid as user_id,
+        a.veterinarian_id_uuid as veterinarian_id,
         a.appointment_date,
         a.appointment_time,
+        a.appointment_title,
+        a.contact_number,
         a.reason,
         a.status,
         a.reschedule_reason,
@@ -41,8 +43,8 @@ export async function GET(request: NextRequest) {
         v.email as veterinarian_email,
         v.contact_number as veterinarian_contact
       FROM appointments a
-      JOIN users u ON a.user_id = u.id
-      JOIN users v ON a.veterinarian_id = v.id
+      JOIN users u ON a.user_id_uuid = u.id
+      JOIN users v ON a.veterinarian_id_uuid = v.id
       WHERE 1=1
     `;
 
@@ -51,10 +53,10 @@ export async function GET(request: NextRequest) {
 
     // Filter by user role
     if (session.user.userRole === 'USER') {
-      query += ` AND a.user_id = $${++paramCount}`;
+      query += ` AND a.user_id_uuid = $${++paramCount}`;
       params.push(session.user.id);
     } else if (session.user.userRole === 'VETERINARIAN') {
-      query += ` AND a.veterinarian_id = $${++paramCount}`;
+      query += ` AND a.veterinarian_id_uuid = $${++paramCount}`;
       params.push(session.user.id);
     }
     // SUPER_ADMIN can see all appointments
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (veterinarianId) {
-      query += ` AND a.veterinarian_id = $${++paramCount}`;
+      query += ` AND a.veterinarian_id_uuid = $${++paramCount}`;
       params.push(veterinarianId);
     }
 
@@ -74,9 +76,22 @@ export async function GET(request: NextRequest) {
 
     const result = await pool.query(query, params);
     
+    // Ensure dates are returned as strings to avoid timezone conversion issues
+    const appointments = result.rows.map(row => ({
+      ...row,
+      appointment_date: row.appointment_date instanceof Date 
+        ? row.appointment_date.toISOString().split('T')[0]
+        : typeof row.appointment_date === 'string' && row.appointment_date.includes('T')
+        ? row.appointment_date.split('T')[0]
+        : row.appointment_date,
+      appointment_time: typeof row.appointment_time === 'string' 
+        ? row.appointment_time 
+        : row.appointment_time?.toString() || ''
+    }));
+    
     return NextResponse.json({
       success: true,
-      appointments: result.rows
+      appointments
     });
 
   } catch (error) {
@@ -110,13 +125,15 @@ export async function POST(request: NextRequest) {
       veterinarian_id, 
       appointment_date, 
       appointment_time, 
+      appointment_title,
+      contact_number,
       reason 
     } = body;
 
     // Validate required fields
-    if (!veterinarian_id || !appointment_date || !appointment_time) {
+    if (!veterinarian_id || !appointment_date || !appointment_time || !appointment_title || !contact_number) {
       return NextResponse.json(
-        { error: 'Missing required fields: veterinarian_id, appointment_date, appointment_time' },
+        { error: 'Missing required fields: veterinarian_id, appointment_date, appointment_time, appointment_title, contact_number' },
         { status: 400 }
       );
     }
@@ -146,7 +163,7 @@ export async function POST(request: NextRequest) {
     // Check for conflicting appointments
     const conflictResult = await pool.query(
       `SELECT id FROM appointments 
-       WHERE veterinarian_id = $1 
+       WHERE veterinarian_id_uuid = $1 
        AND appointment_date = $2 
        AND appointment_time = $3 
        AND status IN ('pending', 'accepted')`,
@@ -160,13 +177,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Update user's contact number if provided and different from stored value
+    if (contact_number) {
+      await pool.query(
+        'UPDATE users SET contact_number = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND (contact_number IS NULL OR contact_number != $1)',
+        [contact_number, session.user.id]
+      );
+    }
+
     // Create the appointment
     const result = await pool.query(
       `INSERT INTO appointments 
-       (user_id, veterinarian_id, appointment_date, appointment_time, reason, status, payment_status)
-       VALUES ($1, $2, $3, $4, $5, 'pending', 'unpaid')
+       (user_id_uuid, veterinarian_id_uuid, appointment_date, appointment_time, appointment_title, contact_number, reason, status, payment_status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', 'unpaid')
        RETURNING *`,
-      [session.user.id, veterinarian_id, appointment_date, appointment_time, reason || null]
+      [session.user.id, veterinarian_id, appointment_date, appointment_time, appointment_title, contact_number, reason || null]
     );
 
     const appointment = result.rows[0];

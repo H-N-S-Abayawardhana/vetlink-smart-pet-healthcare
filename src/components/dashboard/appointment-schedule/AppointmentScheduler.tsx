@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Alert from '@/components/ui/Alert';
 
 interface Veterinarian {
-  id: number;
+  id: string;
   username: string;
   email: string;
   contact_number?: string;
@@ -26,12 +26,15 @@ interface AppointmentSchedulerProps {
 
 export default function AppointmentScheduler({ onAppointmentCreated }: AppointmentSchedulerProps) {
   const [veterinarians, setVeterinarians] = useState<Veterinarian[]>([]);
-  const [selectedVet, setSelectedVet] = useState<number | null>(null);
+  const [selectedVet, setSelectedVet] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [appointmentTitle, setAppointmentTitle] = useState<string>('');
+  const [contactNumber, setContactNumber] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -71,7 +74,7 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
     if (!selectedVet || !selectedDate) return;
 
     try {
-      setLoading(true);
+      setLoadingAvailability(true);
       const response = await fetch(
         `/api/veterinarians/${selectedVet}/availability?date=${selectedDate}`
       );
@@ -88,15 +91,15 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
       setTimeSlots([]);
       console.error('Error fetching availability:', err);
     } finally {
-      setLoading(false);
+      setLoadingAvailability(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedVet || !selectedDate || !selectedTime) {
-      setError('Please select a veterinarian, date, and time');
+    if (!selectedVet || !selectedDate || !selectedTime || !appointmentTitle.trim() || !contactNumber.trim()) {
+      setError('Please fill in all required fields');
       return;
     }
 
@@ -113,6 +116,8 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
           veterinarian_id: selectedVet,
           appointment_date: selectedDate,
           appointment_time: selectedTime,
+          appointment_title: appointmentTitle.trim() || null,
+          contact_number: contactNumber.trim() || null,
           reason: reason.trim() || null,
         }),
       });
@@ -127,6 +132,8 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
         setSelectedVet(null);
         setSelectedDate('');
         setSelectedTime('');
+        setAppointmentTitle('');
+        setContactNumber('');
         setReason('');
         setTimeSlots([]);
       } else {
@@ -159,6 +166,38 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Appointment Title */}
+        <div>
+          <label htmlFor="appointmentTitle" className="block text-sm font-medium text-gray-700 mb-2">
+            Appointment Title *
+          </label>
+          <input
+            type="text"
+            id="appointmentTitle"
+            value={appointmentTitle}
+            onChange={(e) => setAppointmentTitle(e.target.value)}
+            placeholder="e.g., Regular Checkup, Vaccination, Emergency Visit"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        {/* Contact Number */}
+        <div>
+          <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-2">
+            Contact Number *
+          </label>
+          <input
+            type="tel"
+            id="contactNumber"
+            value={contactNumber}
+            onChange={(e) => setContactNumber(e.target.value)}
+            placeholder="Your contact number"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
         {/* Veterinarian Selection */}
         <div>
           <label htmlFor="veterinarian" className="block text-sm font-medium text-gray-700 mb-2">
@@ -167,7 +206,7 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
           <select
             id="veterinarian"
             value={selectedVet || ''}
-            onChange={(e) => setSelectedVet(parseInt(e.target.value) || null)}
+            onChange={(e) => setSelectedVet(e.target.value || null)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           >
@@ -202,7 +241,7 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
             <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
               Select Time *
             </label>
-            {loading ? (
+            {loadingAvailability ? (
               <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                 <span className="ml-2 text-gray-600">Loading available times...</span>
@@ -249,11 +288,11 @@ export default function AppointmentScheduler({ onAppointmentCreated }: Appointme
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end">
+        <div>
           <button
             type="submit"
-            disabled={loading || !selectedVet || !selectedDate || !selectedTime}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || !selectedVet || !selectedDate || !selectedTime || !appointmentTitle.trim() || !contactNumber.trim()}
+            className="w-full px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Scheduling...' : 'Schedule Appointment'}
           </button>
