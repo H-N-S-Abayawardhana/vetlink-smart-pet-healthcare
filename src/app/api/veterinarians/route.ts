@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
         COUNT(CASE WHEN a.status = 'pending' THEN 1 END) as pending_appointments,
         COUNT(CASE WHEN a.status = 'accepted' THEN 1 END) as accepted_appointments
       FROM users u
-      LEFT JOIN appointments a ON u.id = a.veterinarian_id 
+      LEFT JOIN appointments a ON u.id = a.veterinarian_id_uuid 
         AND a.appointment_date = $1
         AND a.status IN ('pending', 'accepted')
       WHERE u.user_role = 'VETERINARIAN' 

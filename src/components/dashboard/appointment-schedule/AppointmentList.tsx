@@ -76,16 +76,77 @@ export default function AppointmentList({
     }
   };
 
-  const formatDateTime = (date: string, time: string) => {
-    const appointmentDate = new Date(`${date}T${time}`);
-    return appointmentDate.toLocaleString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const formatDateTime = (date: string | Date, time: string) => {
+    try {
+      // Handle different date formats - date might be YYYY-MM-DD or a full timestamp
+      let dateStr: string = '';
+      
+      // If date is a Date object, extract components using UTC methods to avoid timezone shifts
+      if (date instanceof Date) {
+        // Use UTC methods to get the exact date without timezone conversion
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        dateStr = `${year}-${month}-${day}`;
+      } else if (typeof date === 'string') {
+        // Handle ISO date strings (e.g., "2024-12-20T00:00:00.000Z" or "2024-12-20")
+        if (date.includes('T')) {
+          // Extract just the date part before T
+          dateStr = date.split('T')[0];
+        } else if (date.includes(' ')) {
+          // Handle space-separated dates
+          dateStr = date.split(' ')[0];
+        } else {
+          dateStr = date;
+        }
+      } else {
+        return `${date} ${time}`;
+      }
+      
+      // Parse date components directly to avoid timezone issues
+      const dateParts = dateStr.split('-');
+      if (dateParts.length !== 3) {
+        return `${date} ${time}`;
+      }
+      
+      const year = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10); // 1-12
+      const day = parseInt(dateParts[2], 10);
+      
+      // Validate parsed values
+      if (isNaN(year) || isNaN(month) || isNaN(day) || month < 1 || month > 12 || day < 1 || day > 31) {
+        return `${date} ${time}`;
+      }
+      
+      // Parse time components
+      let hour = 0;
+      let minute = 0;
+      if (time && typeof time === 'string' && time.includes(':')) {
+        const timeParts = time.split(':');
+        hour = parseInt(timeParts[0], 10) || 0;
+        minute = parseInt(timeParts[1], 10) || 0;
+      }
+      
+      // Format date and time directly from parsed values (no Date object conversion for formatting)
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      
+      // Get weekday using a Date object (only for weekday calculation, using local time constructor)
+      const dateForWeekday = new Date(year, month - 1, day);
+      const weekday = weekdayNames[dateForWeekday.getDay()];
+      const monthName = monthNames[month - 1];
+      
+      // Format time directly from parsed values
+      const hour12 = hour % 12 || 12;
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const minuteStr = String(minute).padStart(2, '0');
+      const formattedTime = `${hour12}:${minuteStr} ${ampm}`;
+      
+      return `${weekday}, ${monthName} ${day}, ${year} at ${formattedTime}`;
+    } catch (error) {
+      // Fallback to simple display
+      return `${date} ${time}`;
+    }
   };
 
   const canCancel = (appointment: Appointment) => {

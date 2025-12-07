@@ -29,8 +29,9 @@ export async function GET(request: NextRequest) {
       const petsResult = await pool.query('SELECT COUNT(*) as count FROM pets');
       stats.totalPets = parseInt(petsResult.rows[0].count);
     } else {
+      // Cast owner_id to text to match UUID string from session
       const petsResult = await pool.query(
-        'SELECT COUNT(*) as count FROM pets WHERE owner_id = $1',
+        'SELECT COUNT(*) as count FROM pets WHERE owner_id::text = $1',
         [session.user.id]
       );
       stats.totalPets = parseInt(petsResult.rows[0].count);
@@ -47,14 +48,14 @@ export async function GET(request: NextRequest) {
     } else if (userRole === 'VETERINARIAN') {
       const appointmentsResult = await pool.query(
         `SELECT COUNT(*) as count FROM appointments 
-         WHERE veterinarian_id = $1 AND status IN ('pending', 'accepted')`,
+         WHERE veterinarian_id_uuid = $1 AND status IN ('pending', 'accepted')`,
         [session.user.id]
       );
       stats.activeAppointments = parseInt(appointmentsResult.rows[0].count);
     } else {
       const appointmentsResult = await pool.query(
         `SELECT COUNT(*) as count FROM appointments 
-         WHERE user_id = $1 AND status IN ('pending', 'accepted')`,
+         WHERE user_id_uuid = $1 AND status IN ('pending', 'accepted')`,
         [session.user.id]
       );
       stats.activeAppointments = parseInt(appointmentsResult.rows[0].count);

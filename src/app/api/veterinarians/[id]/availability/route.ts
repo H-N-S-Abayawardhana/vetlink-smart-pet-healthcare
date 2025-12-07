@@ -51,7 +51,7 @@ export async function GET(
     const bookedResult = await pool.query(
       `SELECT appointment_time, status 
        FROM appointments 
-       WHERE veterinarian_id = $1 
+       WHERE veterinarian_id_uuid = $1 
        AND appointment_date = $2 
        AND status IN ('pending', 'accepted')
        ORDER BY appointment_time`,
