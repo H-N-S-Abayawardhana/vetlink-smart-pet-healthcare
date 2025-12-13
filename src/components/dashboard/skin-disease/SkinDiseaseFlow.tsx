@@ -1,24 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import type { Pet } from '@/lib/pets';
-import { listPets } from '@/lib/pets';
-import SkinAnalysis from './SkinAnalysis';
-import PetSelector from './PetSelector';
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import type { Pet } from "@/lib/pets";
+import { listPets } from "@/lib/pets";
+import SkinAnalysis from "./SkinAnalysis";
+import PetSelector from "./PetSelector";
 
-type Step = 'pick' | 'analyze';
+type Step = "pick" | "analyze";
 
 export default function SkinDiseaseFlow() {
-  const [step, setStep] = useState<Step>('pick');
+  const [step, setStep] = useState<Step>("pick");
   const [pets, setPets] = useState<Pet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
   const [petsError, setPetsError] = useState<string | null>(null);
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   const selectedPet = useMemo(
-    () => (selectedPetId ? pets.find((p) => p.id === selectedPetId) ?? null : null),
-    [pets, selectedPetId]
+    () =>
+      selectedPetId ? (pets.find((p) => p.id === selectedPetId) ?? null) : null,
+    [pets, selectedPetId],
   );
 
   async function loadPets() {
@@ -28,9 +29,11 @@ export default function SkinDiseaseFlow() {
       const data = await listPets();
       setPets(data || []);
     } catch (e) {
-      console.error('Error loading pets for skin disease page:', e);
+      console.error("Error loading pets for skin disease page:", e);
       setPets([]);
-      setPetsError('Failed to load your pets. You can still continue without selecting a pet.');
+      setPetsError(
+        "Failed to load your pets. You can still continue without selecting a pet.",
+      );
     } finally {
       setLoadingPets(false);
     }
@@ -40,7 +43,7 @@ export default function SkinDiseaseFlow() {
     void loadPets();
   }, []);
 
-  if (step === 'pick') {
+  if (step === "pick") {
     return (
       <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
         <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
@@ -48,7 +51,8 @@ export default function SkinDiseaseFlow() {
             Dog Skin Disease Detection
           </h1>
           <p className="text-sm sm:text-base text-gray-600">
-            Select a pet to attach results to a profile — or continue without selecting one.
+            Select a pet to attach results to a profile — or continue without
+            selecting one.
           </p>
         </div>
 
@@ -59,17 +63,20 @@ export default function SkinDiseaseFlow() {
           selectedPetId={selectedPetId}
           onSelectPetId={setSelectedPetId}
           onRefresh={loadPets}
-          onContinueWithoutPet={() => setStep('analyze')}
-          onContinueWithPet={() => setStep('analyze')}
+          onContinueWithoutPet={() => setStep("analyze")}
+          onContinueWithPet={() => setStep("analyze")}
         />
 
         {!loadingPets && pets.length === 0 && (
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <p className="text-sm text-gray-700 font-medium">No pets found.</p>
+                <p className="text-sm text-gray-700 font-medium">
+                  No pets found.
+                </p>
                 <p className="text-sm text-gray-600">
-                  Create a pet profile to see breed/age and the pet photo in results.
+                  Create a pet profile to see breed/age and the pet photo in
+                  results.
                 </p>
               </div>
               <Link
@@ -89,14 +96,12 @@ export default function SkinDiseaseFlow() {
     <SkinAnalysis
       selectedPet={selectedPet}
       onChangePet={() => {
-        setStep('pick');
+        setStep("pick");
       }}
       onClearPet={() => {
         setSelectedPetId(null);
-        setStep('pick');
+        setStep("pick");
       }}
     />
   );
 }
-
-

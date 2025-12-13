@@ -1,8 +1,14 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Activity, ArrowDown, Sparkles, Stethoscope, Tablets } from 'lucide-react';
+import Image from "next/image";
+import { motion } from "framer-motion";
+import {
+  Activity,
+  ArrowDown,
+  Sparkles,
+  Stethoscope,
+  Tablets,
+} from "lucide-react";
 
 export default function Hero() {
   return (
@@ -24,13 +30,13 @@ export default function Hero() {
           aria-hidden="true"
           className="absolute -top-24 left-1/2 h-80 w-[44rem] -translate-x-1/2 rounded-full bg-[#7C7CFF]/18 blur-3xl"
           animate={{ y: [0, 14, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           aria-hidden="true"
           className="absolute -bottom-28 right-[-10rem] h-80 w-[44rem] rounded-full bg-[#00E5FF]/14 blur-3xl"
           animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
@@ -39,7 +45,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
           className="max-w-4xl mx-auto"
         >
           {/* Logo/Brand */}
@@ -61,8 +67,9 @@ export default function Hero() {
 
           {/* Main tagline */}
           <p className="text-base sm:text-xl md:text-2xl text-gray-200 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-4">
-            Revolutionize your pet's health with AI-powered diagnostics, personalized care plans,
-            and intelligent monitoring. Bringing veterinary expertise to your fingertips.
+            Revolutionize your pet’s health with AI-powered diagnostics,
+            personalized care plans, and intelligent monitoring. Bringing
+            veterinary expertise to your fingertips.
           </p>
 
           {/* Key benefits */}
@@ -76,7 +83,10 @@ export default function Hero() {
             className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 px-4"
           >
             <motion.div
-              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+              variants={{
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0 },
+              }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-6 transition-colors"
             >
@@ -86,12 +96,19 @@ export default function Hero() {
               <div className="relative w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 ring-1 ring-white/15">
                 <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-[#00E5FF]" />
               </div>
-              <h3 className="relative text-base sm:text-lg font-semibold text-slate-50 mb-2">AI-Powered Detection</h3>
-              <p className="relative text-gray-300 text-xs sm:text-sm">Advanced skin care and anomaly detection</p>
+              <h3 className="relative text-base sm:text-lg font-semibold text-slate-50 mb-2">
+                AI-Powered Detection
+              </h3>
+              <p className="relative text-gray-300 text-xs sm:text-sm">
+                Advanced skin care and anomaly detection
+              </p>
             </motion.div>
 
             <motion.div
-              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+              variants={{
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0 },
+              }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-6 transition-colors"
             >
@@ -101,12 +118,19 @@ export default function Hero() {
               <div className="relative w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 ring-1 ring-white/15">
                 <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-[#2DD4BF]" />
               </div>
-              <h3 className="relative text-base sm:text-lg font-semibold text-slate-50 mb-2">Personalized Care</h3>
-              <p className="relative text-gray-300 text-xs sm:text-sm">Custom diet plans and health recommendations</p>
+              <h3 className="relative text-base sm:text-lg font-semibold text-slate-50 mb-2">
+                Personalized Care
+              </h3>
+              <p className="relative text-gray-300 text-xs sm:text-sm">
+                Custom diet plans and health recommendations
+              </p>
             </motion.div>
 
             <motion.div
-              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+              variants={{
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0 },
+              }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-6 transition-colors"
             >
@@ -116,8 +140,12 @@ export default function Hero() {
               <div className="relative w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 ring-1 ring-white/15">
                 <Tablets className="w-5 h-5 sm:w-6 sm:h-6 text-[#7C7CFF]" />
               </div>
-              <h3 className="relative text-base sm:text-lg font-semibold text-slate-50 mb-2">Smart Pharmacy</h3>
-              <p className="relative text-gray-300 text-xs sm:text-sm">Intelligent medication matching system</p>
+              <h3 className="relative text-base sm:text-lg font-semibold text-slate-50 mb-2">
+                Smart Pharmacy
+              </h3>
+              <p className="relative text-gray-300 text-xs sm:text-sm">
+                Intelligent medication matching system
+              </p>
             </motion.div>
           </motion.div>
 
@@ -137,9 +165,15 @@ export default function Hero() {
               Trusted by pet owners and professionals worldwide
             </p>
             <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 text-gray-300/80">
-              <div className="font-semibold text-sm sm:text-base">10,000+ Pet Owners</div>
-              <div className="font-semibold text-sm sm:text-base">500+ Veterinary Clinics</div>
-              <div className="font-semibold text-sm sm:text-base">200+ Pet Pharmacies</div>
+              <div className="font-semibold text-sm sm:text-base">
+                10,000+ Pet Owners
+              </div>
+              <div className="font-semibold text-sm sm:text-base">
+                500+ Veterinary Clinics
+              </div>
+              <div className="font-semibold text-sm sm:text-base">
+                200+ Pet Pharmacies
+              </div>
             </div>
           </div>
         </motion.div>
@@ -149,7 +183,7 @@ export default function Hero() {
       <motion.div
         className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2"
         animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
       >
         <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6 text-slate-50/80" />
       </motion.div>

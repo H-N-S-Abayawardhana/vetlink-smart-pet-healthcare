@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -11,7 +11,10 @@ export default function PrimaryFeatures() {
   };
 
   return (
-    <section id="primary-features" className="relative overflow-hidden py-12 md:py-16 bg-[#0B1020]">
+    <section
+      id="primary-features"
+      className="relative overflow-hidden py-12 md:py-16 bg-[#0B1020]"
+    >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 left-[-10rem] h-72 w-[40rem] rounded-full bg-[#7C7CFF]/14 blur-3xl" />
         <div className="absolute -bottom-24 right-[-10rem] h-72 w-[40rem] rounded-full bg-[#00E5FF]/12 blur-3xl" />
@@ -31,7 +34,8 @@ export default function PrimaryFeatures() {
             Primary Features
           </h2>
           <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto">
-            Essential pet care services that form the foundation of comprehensive veterinary healthcare
+            Essential pet care services that form the foundation of
+            comprehensive veterinary healthcare
           </p>
         </motion.div>
 
@@ -40,7 +44,10 @@ export default function PrimaryFeatures() {
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.08 } },
+          }}
           className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
         >
           {/* Feature 1: Appointment Scheduling */}
@@ -57,9 +64,12 @@ export default function PrimaryFeatures() {
                 <CalendarDays className="w-5 h-5 text-[#00E5FF]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">Appointment Scheduling</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">
+                  Appointment Scheduling
+                </h3>
                 <p className="text-gray-300 text-sm md:text-base mb-3">
-                  Book vet appointments instantly with smart scheduling and automated reminders.
+                  Book vet appointments instantly with smart scheduling and
+                  automated reminders.
                 </p>
                 <div className="relative h-24 md:h-28 rounded-xl overflow-hidden ring-1 ring-white/10">
                   <Image
@@ -89,9 +99,12 @@ export default function PrimaryFeatures() {
                 <FileText className="w-5 h-5 text-[#2DD4BF]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">Digital Health Records</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">
+                  Digital Health Records
+                </h3>
                 <p className="text-gray-300 text-sm md:text-base mb-3">
-                  Maintain comprehensive digital health records and track medical history securely.
+                  Maintain comprehensive digital health records and track
+                  medical history securely.
                 </p>
                 <div className="relative h-24 md:h-28 rounded-xl overflow-hidden ring-1 ring-white/10">
                   <Image
@@ -121,9 +134,12 @@ export default function PrimaryFeatures() {
                 <Headset className="w-5 h-5 text-[#7C7CFF]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">24/7 Emergency Support</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">
+                  24/7 Emergency Support
+                </h3>
                 <p className="text-gray-300 text-sm md:text-base mb-3">
-                  Get instant access to emergency veterinary support and first aid guidance.
+                  Get instant access to emergency veterinary support and first
+                  aid guidance.
                 </p>
                 <div className="relative h-24 md:h-28 rounded-xl overflow-hidden ring-1 ring-white/10">
                   <Image
@@ -153,9 +169,12 @@ export default function PrimaryFeatures() {
                 <MessageCircle className="w-5 h-5 text-[#00E5FF]" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">Expert Vet Consultation</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-slate-50 mb-2">
+                  Expert Vet Consultation
+                </h3>
                 <p className="text-gray-300 text-sm md:text-base mb-3">
-                  Connect with certified veterinarians for professional advice and remote diagnosis.
+                  Connect with certified veterinarians for professional advice
+                  and remote diagnosis.
                 </p>
                 <div className="relative h-24 md:h-28 rounded-xl overflow-hidden ring-1 ring-white/10">
                   <Image

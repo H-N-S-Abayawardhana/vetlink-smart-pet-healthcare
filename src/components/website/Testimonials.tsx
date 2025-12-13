@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Quote } from 'lucide-react';
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { Quote } from "lucide-react";
 
 export default function Testimonials() {
   const fadeUp = {
@@ -11,7 +11,10 @@ export default function Testimonials() {
   };
 
   return (
-    <section id="testimonials" className="relative overflow-hidden py-20 bg-[#0B1020]">
+    <section
+      id="testimonials"
+      className="relative overflow-hidden py-20 bg-[#0B1020]"
+    >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 left-[-10rem] h-80 w-[42rem] rounded-full bg-[#7C7CFF]/16 blur-3xl" />
         <div className="absolute -bottom-24 right-[-10rem] h-80 w-[42rem] rounded-full bg-[#00E5FF]/14 blur-3xl" />
@@ -24,14 +27,15 @@ export default function Testimonials() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-12 md:mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-slate-50 mb-4 tracking-tight">
             What Pet Owners Say
           </h2>
           <p className="text-lg md:text-xl text-gray-300">
-            Real stories from pet owners who trust VetLink with their pets&apos; health
+            Real stories from pet owners who trust VetLink with their pets&apos;
+            health
           </p>
         </motion.div>
 
@@ -44,7 +48,7 @@ export default function Testimonials() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55, ease: 'easeOut' }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="snap-start md:snap-none shrink-0 md:shrink flex-none md:flex-auto w-[86%] sm:w-[70%] md:w-auto group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7"
             >
@@ -66,8 +70,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-300 italic leading-relaxed">
-                "VetLink&apos;s skin detection feature helped me catch my dog&apos;s early-stage dermatitis.
-                The AI recommendations were spot-on and saved us a costly vet visit!"
+                “VetLink&apos;s skin detection feature helped me catch my
+                dog&apos;s early-stage dermatitis. The AI recommendations were
+                spot-on and saved us a costly vet visit!”
               </p>
             </motion.div>
 
@@ -77,7 +82,7 @@ export default function Testimonials() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55, ease: 'easeOut', delay: 0.05 }}
+              transition={{ duration: 0.55, ease: "easeOut", delay: 0.05 }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="snap-start md:snap-none shrink-0 md:shrink flex-none md:flex-auto w-[86%] sm:w-[70%] md:w-auto group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7"
             >
@@ -99,8 +104,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-300 italic leading-relaxed">
-                "The anomaly detection system alerted me when my cat started limping.
-                Early detection meant faster treatment and a quicker recovery."
+                “The anomaly detection system alerted me when my cat started
+                limping. Early detection meant faster treatment and a quicker
+                recovery.”
               </p>
             </motion.div>
 
@@ -110,7 +116,7 @@ export default function Testimonials() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+              transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="snap-start md:snap-none shrink-0 md:shrink flex-none md:flex-auto w-[86%] sm:w-[70%] md:w-auto group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7"
             >
@@ -127,13 +133,16 @@ export default function Testimonials() {
                   />
                 </div>
                 <div className="ml-4">
-                  <h4 className="font-semibold text-slate-50">Emily Rodriguez</h4>
+                  <h4 className="font-semibold text-slate-50">
+                    Emily Rodriguez
+                  </h4>
                   <p className="text-gray-400">Multi-Pet Owner</p>
                 </div>
               </div>
               <p className="text-gray-300 italic leading-relaxed">
-                "The AI diet plans have been a game-changer for my pets&apos; health.
-                Each of my three pets has a personalized nutrition plan that works perfectly!"
+                “The AI diet plans have been a game-changer for my pets&apos;
+                health. Each of my three pets has a personalized nutrition plan
+                that works perfectly!”
               </p>
             </motion.div>
 
@@ -143,7 +152,7 @@ export default function Testimonials() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55, ease: 'easeOut', delay: 0.15 }}
+              transition={{ duration: 0.55, ease: "easeOut", delay: 0.15 }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="snap-start md:snap-none shrink-0 md:shrink flex-none md:flex-auto w-[86%] sm:w-[70%] md:w-auto group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7"
             >
@@ -160,13 +169,16 @@ export default function Testimonials() {
                   />
                 </div>
                 <div className="ml-4">
-                  <h4 className="font-semibold text-slate-50">David Thompson</h4>
+                  <h4 className="font-semibold text-slate-50">
+                    David Thompson
+                  </h4>
                   <p className="text-gray-400">Golden Retriever Owner</p>
                 </div>
               </div>
               <p className="text-gray-300 italic leading-relaxed">
-                "The health monitoring dashboard gives me peace of mind. I can track my dog&apos;s activity levels,
-                sleep patterns, and overall wellness trends all in one place."
+                “The health monitoring dashboard gives me peace of mind. I can
+                track my dog&apos;s activity levels, sleep patterns, and overall
+                wellness trends all in one place.”
               </p>
             </motion.div>
 
@@ -176,7 +188,7 @@ export default function Testimonials() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55, ease: 'easeOut', delay: 0.2 }}
+              transition={{ duration: 0.55, ease: "easeOut", delay: 0.2 }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="snap-start md:snap-none shrink-0 md:shrink flex-none md:flex-auto w-[86%] sm:w-[70%] md:w-auto group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7"
             >
@@ -198,8 +210,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-300 italic leading-relaxed">
-                "VetLink&apos;s grooming recommendations are fantastic! My Persian cat&apos;s coat has never looked better.
-                The AI suggested the perfect grooming schedule and products."
+                “VetLink&apos;s grooming recommendations are fantastic! My
+                Persian cat&apos;s coat has never looked better. The AI
+                suggested the perfect grooming schedule and products.”
               </p>
             </motion.div>
 
@@ -209,7 +222,7 @@ export default function Testimonials() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55, ease: 'easeOut', delay: 0.25 }}
+              transition={{ duration: 0.55, ease: "easeOut", delay: 0.25 }}
               whileHover={{ y: -6, scale: 1.02 }}
               className="snap-start md:snap-none shrink-0 md:shrink flex-none md:flex-auto w-[86%] sm:w-[70%] md:w-auto group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7"
             >
@@ -231,8 +244,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-300 italic leading-relaxed">
-                "As my dog ages, VetLink&apos;s senior care features have been invaluable. The medication reminders
-                and health alerts help me provide the best care for my 12-year-old companion."
+                “As my dog ages, VetLink&apos;s senior care features have been
+                invaluable. The medication reminders and health alerts help me
+                provide the best care for my 12-year-old companion.”
               </p>
             </motion.div>
           </div>

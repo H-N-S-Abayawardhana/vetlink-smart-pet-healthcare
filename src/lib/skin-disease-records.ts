@@ -11,17 +11,19 @@ export interface SkinDiseaseRecord {
   createdAt: string | null;
 }
 
-export async function listSkinDiseaseRecords(petId: string): Promise<SkinDiseaseRecord[]> {
+export async function listSkinDiseaseRecords(
+  petId: string,
+): Promise<SkinDiseaseRecord[]> {
   try {
     const res = await fetch(`/api/pets/${petId}/skin-disease`);
     if (!res.ok) {
-      console.error('listSkinDiseaseRecords: API responded with', res.status);
+      console.error("listSkinDiseaseRecords: API responded with", res.status);
       return [];
     }
     const data = await res.json();
     return data.records || [];
   } catch (e) {
-    console.error('listSkinDiseaseRecords error', e);
+    console.error("listSkinDiseaseRecords error", e);
     return [];
   }
 }
@@ -33,13 +35,18 @@ export async function createSkinDiseaseRecord(
     disease: string;
     confidence?: number | null;
     allProbabilities?: Record<string, number> | null;
-  }
+  },
 ): Promise<SkinDiseaseRecord | null> {
   const formData = new FormData();
   formData.append("image", payload.file);
   formData.append("disease", payload.disease);
-  if (payload.confidence != null) formData.append("confidence", String(payload.confidence));
-  if (payload.allProbabilities) formData.append("allProbabilities", JSON.stringify(payload.allProbabilities));
+  if (payload.confidence != null)
+    formData.append("confidence", String(payload.confidence));
+  if (payload.allProbabilities)
+    formData.append(
+      "allProbabilities",
+      JSON.stringify(payload.allProbabilities),
+    );
 
   const res = await fetch(`/api/pets/${petId}/skin-disease`, {
     method: "POST",
@@ -54,5 +61,3 @@ export async function createSkinDiseaseRecord(
   const data = await res.json();
   return data.record || null;
 }
-
-

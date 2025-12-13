@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { getSidebarNavItems } from './sidebar-nav';
-import { UserRole } from '@/types/next-auth';
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { getSidebarNavItems } from "./sidebar-nav";
+import { UserRole } from "@/types/next-auth";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -16,11 +16,12 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  
+
   // Get user role from session
-  const userRole = (session?.user as any)?.userRole as UserRole || 'USER';
-  
-  const { top: navigationItems, bottom: bottomNavigationItems } = getSidebarNavItems(userRole);
+  const userRole = ((session?.user as any)?.userRole as UserRole) || "USER";
+
+  const { top: navigationItems, bottom: bottomNavigationItems } =
+    getSidebarNavItems(userRole);
 
   return (
     <>
@@ -35,7 +36,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 flex-shrink-0">
@@ -71,13 +72,15 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   onClick={onToggle}
                   className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   <span
                     className={`mr-3 flex-shrink-0 ${
-                      isActive ? 'text-blue-700' : 'text-gray-400 group-hover:text-gray-500'
+                      isActive
+                        ? "text-blue-700"
+                        : "text-gray-400 group-hover:text-gray-500"
                     }`}
                   >
                     <IconComponent className="w-5 h-5" />
@@ -100,13 +103,15 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     onClick={onToggle}
                     className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                   >
                     <span
                       className={`mr-3 flex-shrink-0 ${
-                        isActive ? 'text-blue-700' : 'text-gray-400 group-hover:text-gray-500'
+                        isActive
+                          ? "text-blue-700"
+                          : "text-gray-400 group-hover:text-gray-500"
                       }`}
                     >
                       <IconComponent className="w-5 h-5" />

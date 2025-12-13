@@ -1,34 +1,46 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Brain, Mail, MessageSquareText, PawPrint, Sparkles, User } from 'lucide-react';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Brain,
+  Mail,
+  MessageSquareText,
+  PawPrint,
+  Sparkles,
+  User,
+} from "lucide-react";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
+    name: "",
+    email: "",
+    message: "",
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Frontend only - form submission logic would go here
-    console.log('Form submitted:', formData);
-    alert('Thank you for your message! We\'ll get back to you soon.');
-    setFormData({ name: '', email: '', message: '' });
+    console.log("Form submitted:", formData);
+    alert("Thank you for your message! We'll get back to you soon.");
+    setFormData({ name: "", email: "", message: "" });
   };
 
   return (
-    <section id="contact" className="relative overflow-hidden py-20 bg-[#0B1020]">
+    <section
+      id="contact"
+      className="relative overflow-hidden py-20 bg-[#0B1020]"
+    >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 right-[-10rem] h-80 w-[42rem] rounded-full bg-[#00E5FF]/15 blur-3xl" />
         <div className="absolute -bottom-24 left-[-10rem] h-80 w-[42rem] rounded-full bg-[#7C7CFF]/18 blur-3xl" />
@@ -40,14 +52,15 @@ export default function Contact() {
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-slate-50 mb-4 tracking-tight">
-            Ready to Transform Your Pet's Healthcare?
+            Ready to Transform Your Pet’s Healthcare?
           </h2>
           <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Join thousands of pet owners who trust VetLink for their pets' health and wellbeing.
+            Join thousands of pet owners who trust VetLink for their pets’
+            health and wellbeing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <button className="rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#2DD4BF] text-[#0B1020] px-8 py-3 text-lg font-semibold transition-all duration-200 cursor-pointer hover:brightness-110 hover:shadow-[0_0_0_1px_rgba(0,229,255,0.35),0_18px_40px_-18px_rgba(0,229,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/60">
@@ -64,7 +77,7 @@ export default function Contact() {
           initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
         >
           {/* Visual panel (UI only) */}
@@ -78,13 +91,18 @@ export default function Contact() {
                   <Brain className="h-5 w-5 text-[#00E5FF]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">AI-Powered Pet Healthcare</p>
-                  <h3 className="text-xl font-bold text-slate-50">Get in Touch</h3>
+                  <p className="text-sm text-gray-400">
+                    AI-Powered Pet Healthcare
+                  </p>
+                  <h3 className="text-xl font-bold text-slate-50">
+                    Get in Touch
+                  </h3>
                 </div>
               </div>
 
               <p className="text-gray-300 leading-relaxed mb-7">
-                Have questions about VetLink? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                Have questions about VetLink? We’d love to hear from you. Send
+                us a message and we’ll respond as soon as possible.
               </p>
 
               <div className="space-y-4">
@@ -94,7 +112,10 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-50">Fast answers</p>
-                    <p className="text-sm text-gray-400">Get clear guidance from a team that understands pets and AI.</p>
+                    <p className="text-sm text-gray-400">
+                      Get clear guidance from a team that understands pets and
+                      AI.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
@@ -103,7 +124,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-50">Trusted care</p>
-                    <p className="text-sm text-gray-400">Designed for pet owners, clinics, and pharmacies.</p>
+                    <p className="text-sm text-gray-400">
+                      Designed for pet owners, clinics, and pharmacies.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -116,7 +139,10 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="group">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-[#00E5FF]">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-[#00E5FF]"
+                    >
                       Full Name *
                     </label>
                     <div className="relative">
@@ -135,7 +161,10 @@ export default function Contact() {
                   </div>
 
                   <div className="group">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-[#00E5FF]">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-[#00E5FF]"
+                    >
                       Email Address *
                     </label>
                     <div className="relative">
@@ -155,7 +184,10 @@ export default function Contact() {
                 </div>
 
                 <div className="group">
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-[#00E5FF]">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-300 mb-2 transition-colors group-focus-within:text-[#00E5FF]"
+                  >
                     Message *
                   </label>
                   <div className="relative">

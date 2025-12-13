@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { Pet } from '@/lib/pets';
+import type { Pet } from "@/lib/pets";
 
 interface Props {
   pets: Pet[];
@@ -32,9 +32,12 @@ export default function PetSelector({
     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Select your pet (optional)</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+            Select your pet (optional)
+          </h2>
           <p className="text-sm text-gray-600">
-            If you select a pet, the result screen will include the pet photo, breed, and age.
+            If you select a pet, the result screen will include the pet photo,
+            breed, and age.
           </p>
         </div>
 
@@ -63,7 +66,9 @@ export default function PetSelector({
       ) : pets.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center">
           <p className="text-sm text-gray-700">You don’t have any pets yet.</p>
-          <p className="text-sm text-gray-600 mt-1">You can continue without selecting a pet.</p>
+          <p className="text-sm text-gray-600 mt-1">
+            You can continue without selecting a pet.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -78,15 +83,19 @@ export default function PetSelector({
                 onClick={() => onSelectPetId(pet.id)}
                 className={`text-left rounded-xl border p-4 transition-all ${
                   selected
-                    ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    ? "border-blue-500 ring-2 ring-blue-200 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
                     {avatar ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={avatar} alt={pet.name} className="w-full h-full object-cover" />
+                      <img
+                        src={avatar}
+                        alt={pet.name}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <span className="text-2xl">🐾</span>
                     )}
@@ -94,16 +103,22 @@ export default function PetSelector({
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="font-semibold text-gray-900 truncate">{pet.name}</div>
+                      <div className="font-semibold text-gray-900 truncate">
+                        {pet.name}
+                      </div>
                       {selected && (
                         <span className="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
                           Selected
                         </span>
                       )}
                     </div>
-                    <div className="mt-1 text-sm text-gray-600 truncate">{pet.breed || 'Breed: —'}</div>
+                    <div className="mt-1 text-sm text-gray-600 truncate">
+                      {pet.breed || "Breed: —"}
+                    </div>
                     <div className="mt-0.5 text-xs text-gray-500">
-                      {pet.ageYears != null ? `Age: ${pet.ageYears} ${pet.ageYears === 1 ? 'year' : 'years'}` : 'Age: —'}
+                      {pet.ageYears != null
+                        ? `Age: ${pet.ageYears} ${pet.ageYears === 1 ? "year" : "years"}`
+                        : "Age: —"}
                     </div>
                   </div>
                 </div>
@@ -134,5 +149,3 @@ export default function PetSelector({
     </div>
   );
 }
-
-

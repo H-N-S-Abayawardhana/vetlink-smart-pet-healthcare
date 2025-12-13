@@ -1,5 +1,5 @@
-import type { ComponentType, SVGProps } from 'react';
-import type { UserRole } from '@/types/next-auth';
+import type { ComponentType, SVGProps } from "react";
+import type { UserRole } from "@/types/next-auth";
 import {
   HomeIcon,
   HeartIcon,
@@ -8,11 +8,11 @@ import {
   LightBulbIcon,
   EyeIcon,
   CogIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 
 export type SidebarIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
-export type SidebarNavPlacement = 'top' | 'bottom';
+export type SidebarNavPlacement = "top" | "bottom";
 
 export interface SidebarNavItem {
   name: string;
@@ -24,65 +24,71 @@ export interface SidebarNavItem {
 
 const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   {
-    name: 'Dashboard',
-    href: '/dashboard',
+    name: "Dashboard",
+    href: "/dashboard",
     icon: HomeIcon,
-    roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER'],
+    roles: ["SUPER_ADMIN", "VETERINARIAN", "USER"],
   },
   {
-    name: 'My Pets',
-    href: '/dashboard/pets',
+    name: "My Pets",
+    href: "/dashboard/pets",
     icon: HeartIcon,
-    roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER'],
+    roles: ["USER"],
   },
   {
-    name: 'BCS Calculator',
-    href: '/dashboard/pets/bcs',
+    name: "All Pets",
+    href: "/dashboard/pets",
+    icon: HeartIcon,
+    roles: ["SUPER_ADMIN", "VETERINARIAN"],
+  },
+  {
+    name: "BCS Calculator",
+    href: "/dashboard/pets/bcs",
     icon: LightBulbIcon,
-    roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER'],
+    roles: ["USER"],
   },
   {
-    name: 'Diet Recommendations',
-    href: '/dashboard/pets/diet',
+    name: "Diet Recommendations",
+    href: "/dashboard/pets/diet",
     icon: DocumentTextIcon,
-    roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER'],
+    roles: ["USER"],
   },
   {
-    name: 'Schedule Appointment',
-    href: '/dashboard/appointment-schedule',
+    name: "Schedule Appointment",
+    href: "/dashboard/appointment-schedule",
     icon: CalendarIcon,
-    roles: ['USER'],
+    roles: ["USER"],
   },
   {
-    name: 'Appointments',
-    href: '/dashboard/appointment-schedule',
+    name: "Appointments",
+    href: "/dashboard/appointment-schedule",
     icon: CalendarIcon,
-    roles: ['SUPER_ADMIN'],
+    roles: ["SUPER_ADMIN"],
   },
   {
-    name: 'Manage Appointments',
-    href: '/dashboard/veterinarian-appointments',
+    name: "Manage Appointments",
+    href: "/dashboard/veterinarian-appointments",
     icon: CalendarIcon,
-    roles: ['VETERINARIAN'],
+    roles: ["VETERINARIAN"],
   },
   {
-    name: 'Skin Disease Detection',
-    href: '/dashboard/skin-disease',
+    name: "Skin Disease Detection",
+    href: "/dashboard/skin-disease",
     icon: EyeIcon,
-    roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER'],
+    roles: ["SUPER_ADMIN", "VETERINARIAN", "USER"],
   },
   {
-    name: 'Limping Detection',
-    href: '/dashboard/Limping',
+    name: "Limping Detection",
+    href: "/dashboard/Limping",
     icon: EyeIcon,
-    roles: ['SUPER_ADMIN', 'VETERINARIAN'],
+    roles: ["SUPER_ADMIN", "VETERINARIAN"],
   },
   {
-    name: 'Settings',
-    href: '/dashboard/settings',
+    name: "Settings",
+    href: "/dashboard/settings",
     icon: CogIcon,
-    roles: ['SUPER_ADMIN'],
-    placement: 'bottom',
+    roles: ["SUPER_ADMIN"],
+    placement: "bottom",
   },
 ];
 
@@ -90,11 +96,11 @@ export function getSidebarNavItems(userRole: UserRole): {
   top: SidebarNavItem[];
   bottom: SidebarNavItem[];
 } {
-  const allowed = SIDEBAR_NAV_ITEMS.filter((item) => item.roles.includes(userRole));
+  const allowed = SIDEBAR_NAV_ITEMS.filter((item) =>
+    item.roles.includes(userRole),
+  );
   return {
-    top: allowed.filter((item) => (item.placement ?? 'top') === 'top'),
-    bottom: allowed.filter((item) => item.placement === 'bottom'),
+    top: allowed.filter((item) => (item.placement ?? "top") === "top"),
+    bottom: allowed.filter((item) => item.placement === "bottom"),
   };
 }
-
-
