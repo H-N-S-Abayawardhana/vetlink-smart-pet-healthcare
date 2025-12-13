@@ -6,8 +6,8 @@ import PaymentModal from './PaymentModal';
 
 interface Appointment {
   id: number;
-  user_id: number;
-  veterinarian_id: number;
+  user_id: string;
+  veterinarian_id: string;
   appointment_date: string;
   appointment_time: string;
   reason: string;
@@ -32,13 +32,21 @@ interface AppointmentListProps {
   onAppointmentUpdated: (appointment: Appointment) => void;
   onAppointmentCancelled: (appointmentId: number) => void;
   onRefresh: () => void;
+  title?: string;
+  emptyText?: string;
+  showUserDetails?: boolean;
+  readOnly?: boolean;
 }
 
 export default function AppointmentList({ 
   appointments, 
   onAppointmentUpdated, 
   onAppointmentCancelled,
-  onRefresh 
+  onRefresh,
+  title,
+  emptyText,
+  showUserDetails = false,
+  readOnly = false,
 }: AppointmentListProps) {
   const [loading, setLoading] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -197,7 +205,7 @@ export default function AppointmentList({
           </div>
           <h3 className="mt-2 text-sm font-medium text-gray-900">No appointments</h3>
           <p className="mt-1 text-sm text-gray-500">
-            You haven't scheduled any appointments yet.
+            {emptyText || "You haven't scheduled any appointments yet."}
           </p>
           <div className="mt-6">
             <button
@@ -217,7 +225,7 @@ export default function AppointmentList({
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium text-gray-900">
-            My Appointments ({appointments.length})
+            {title || `My Appointments (${appointments.length})`}
           </h2>
           <button
             onClick={handleRefresh}
@@ -265,6 +273,16 @@ export default function AppointmentList({
                 </div>
                 
                 <div className="mt-2 space-y-1">
+                  {showUserDetails && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Pet Owner:</span> {appointment.user_name} ({appointment.user_email})
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Veterinarian:</span> Dr. {appointment.veterinarian_name} ({appointment.veterinarian_email})
+                      </p>
+                    </div>
+                  )}
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Veterinarian:</span> Dr. {appointment.veterinarian_name}
                   </p>
@@ -292,41 +310,43 @@ export default function AppointmentList({
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                {appointment.status === 'accepted' && appointment.payment_status === 'unpaid' && (
-                  <button
-                    onClick={() => {
-                      setSelectedAppointment(appointment);
-                      setPaymentModalOpen(true);
-                    }}
-                    className="inline-flex items-center px-3 py-2 border border-green-300 shadow-sm text-sm leading-4 font-medium rounded-md text-green-700 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  >
-                    💳 Pay Now
-                  </button>
-                )}
-                {canCancel(appointment) && (
-                  <button
-                    onClick={() => handleCancel(appointment.id)}
-                    disabled={loading === appointment.id}
-                    className="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading === appointment.id ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
-                        Cancelling...
-                      </>
-                    ) : (
-                      'Cancel'
-                    )}
-                  </button>
-                )}
-              </div>
+              {!readOnly && (
+                <div className="flex items-center space-x-2">
+                  {appointment.status === 'accepted' && appointment.payment_status === 'unpaid' && (
+                    <button
+                      onClick={() => {
+                        setSelectedAppointment(appointment);
+                        setPaymentModalOpen(true);
+                      }}
+                      className="inline-flex items-center px-3 py-2 border border-green-300 shadow-sm text-sm leading-4 font-medium rounded-md text-green-700 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      💳 Pay Now
+                    </button>
+                  )}
+                  {canCancel(appointment) && (
+                    <button
+                      onClick={() => handleCancel(appointment.id)}
+                      disabled={loading === appointment.id}
+                      className="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loading === appointment.id ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
+                          Cancelling...
+                        </>
+                      ) : (
+                        'Cancel'
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      {selectedAppointment && (
+      {!readOnly && selectedAppointment && (
         <PaymentModal
           appointment={selectedAppointment}
           isOpen={paymentModalOpen}

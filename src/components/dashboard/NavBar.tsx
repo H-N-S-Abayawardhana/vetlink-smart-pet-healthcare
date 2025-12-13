@@ -125,7 +125,15 @@ export default function NavBar({ onMenuClick }: NavBarProps) {
                     href="/dashboard/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
-                    Your Profile
+                    My Profile
+                  </a>
+
+                  {/* Pet profiles */}
+                  <a
+                    href="/dashboard/pets"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Pet Profile
                   </a>
                   
                   {userRole === 'SUPER_ADMIN' && (

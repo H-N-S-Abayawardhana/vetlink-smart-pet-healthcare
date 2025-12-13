@@ -24,6 +24,7 @@ export const rolePermissions = {
       '/',
       '/dashboard',
       '/dashboard/pets',
+      '/dashboard/skin-disease',
       '/dashboard/appointment-schedule'
     ],
     description: 'Basic user access with appointment scheduling'
@@ -53,82 +54,6 @@ export function hasAccess(userRole: UserRole, path: string): boolean {
     
     return false;
   });
-}
-
-// Get allowed navigation items for a user role
-export function getAllowedNavigationItems(userRole: UserRole) {
-  const allNavigationItems = [
-    {
-      name: 'Dashboard',
-      href: '/dashboard',
-      icon: 'HomeIcon',
-      roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER']
-    },
-    {
-      name: 'Pets',
-      href: '/dashboard/pets',
-      icon: 'HeartIcon',
-      roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER']
-    },
-    {
-      name: 'BCS Calculator',
-      href: '/dashboard/pets/bcs',
-      icon: 'LightBulbIcon',
-      roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER']
-    },
-    {
-      name: 'Diet Recommendations',
-      href: '/dashboard/pets/diet',
-      icon: 'DocumentTextIcon',
-      roles: ['SUPER_ADMIN', 'VETERINARIAN', 'USER']
-    },
-    {
-      name: 'Appointments',
-      href: '/dashboard/appointment-schedule',
-      icon: 'CalendarIcon',
-      roles: ['SUPER_ADMIN']
-    },
-    {
-      name: 'Schedule Appointment',
-      href: '/dashboard/appointment-schedule',
-      icon: 'CalendarIcon',
-      roles: ['USER']
-    },
-    {
-      name: 'Manage Appointments',
-      href: '/dashboard/veterinarian-appointments',
-      icon: 'CalendarIcon',
-      roles: ['VETERINARIAN']
-    },
-    {
-      name: 'Skin Disease Detection',
-      href: '/dashboard/skin-disease',
-      icon: 'EyeIcon',
-      roles: ['SUPER_ADMIN', 'VETERINARIAN']
-    },
-    {
-      name: 'Limping Detection',
-      href: '/dashboard/Limping',
-      icon: 'EyeIcon',
-      roles: ['SUPER_ADMIN', 'VETERINARIAN']
-    },
-    {
-      name: 'Profile',
-      href: '/dashboard/profile',
-      icon: 'UserIcon',
-      roles: ['SUPER_ADMIN', 'VETERINARIAN']
-    },
-    {
-      name: 'Settings',
-      href: '/dashboard/settings',
-      icon: 'CogIcon',
-      roles: ['SUPER_ADMIN']
-    }
-  ];
-
-  return allNavigationItems.filter(item => 
-    item.roles.includes(userRole)
-  );
 }
 
 // Middleware function to check access

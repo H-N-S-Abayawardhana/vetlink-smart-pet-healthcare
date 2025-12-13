@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       totalPets: 0,
       activeAppointments: 0,
       registeredPetOwners: 0,
-      aiAnalyses: 0, // Keep for now, can be updated later
+      aiAnalyses: 0,
     };
 
     // Get total pets count
@@ -73,9 +73,28 @@ export async function GET(request: NextRequest) {
       stats.registeredPetOwners = 0;
     }
 
-    // AI Analyses - keeping as placeholder for now
-    // This can be updated later when AI analysis feature is implemented
-    stats.aiAnalyses = 0;
+    // AI Analyses (scan count) - sum of JSON array lengths in pets.skin_disease_history
+    // For USER: only their pets; for SUPER_ADMIN/VETERINARIAN: all pets.
+    try {
+      if (userRole === 'SUPER_ADMIN' || userRole === 'VETERINARIAN') {
+        const res = await pool.query(
+          `SELECT COALESCE(SUM(jsonb_array_length(COALESCE(skin_disease_history, '[]'::jsonb))), 0) AS count
+           FROM pets`
+        );
+        stats.aiAnalyses = parseInt(res.rows[0].count, 10) || 0;
+      } else {
+        const res = await pool.query(
+          `SELECT COALESCE(SUM(jsonb_array_length(COALESCE(skin_disease_history, '[]'::jsonb))), 0) AS count
+           FROM pets
+           WHERE owner_id::text = $1`,
+          [session.user.id]
+        );
+        stats.aiAnalyses = parseInt(res.rows[0].count, 10) || 0;
+      }
+    } catch (e) {
+      console.error('Error calculating aiAnalyses:', e);
+      stats.aiAnalyses = 0;
+    }
 
     return NextResponse.json({ stats });
 

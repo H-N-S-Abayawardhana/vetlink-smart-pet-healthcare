@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Pet } from '@/lib/pets';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { listSkinDiseaseRecords, type SkinDiseaseRecord } from '@/lib/skin-disease-records';
 
 interface PetProfileProps {
   pet: Pet;
@@ -10,6 +12,8 @@ interface PetProfileProps {
 
 export default function PetProfile({ pet }: PetProfileProps) {
   const router = useRouter();
+  const [skinRecords, setSkinRecords] = useState<SkinDiseaseRecord[]>([]);
+  const [skinLoading, setSkinLoading] = useState(false);
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return '—';
@@ -23,6 +27,25 @@ export default function PetProfile({ pet }: PetProfileProps) {
       return dateString;
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setSkinLoading(true);
+      try {
+        const records = await listSkinDiseaseRecords(pet.id);
+        if (!cancelled) setSkinRecords(records || []);
+      } catch (e) {
+        console.error('Error loading skin disease records:', e);
+        if (!cancelled) setSkinRecords([]);
+      } finally {
+        if (!cancelled) setSkinLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [pet.id]);
 
   return (
     <div className="space-y-6">
@@ -171,6 +194,67 @@ export default function PetProfile({ pet }: PetProfileProps) {
             <dd className="mt-1 text-sm text-gray-900">{formatDate(pet.updatedAt)}</dd>
           </div>
         </dl>
+      </div>
+
+      {/* Skin Disease History */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Skin Disease History</h2>
+            <p className="text-sm text-gray-500 mt-1">Recent skin scans for this pet</p>
+          </div>
+          <Link
+            href="/dashboard/skin-disease"
+            className="text-sm text-blue-600 hover:text-blue-800 underline whitespace-nowrap"
+          >
+            New scan
+          </Link>
+        </div>
+
+        {skinLoading ? (
+          <div className="flex items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          </div>
+        ) : skinRecords.length === 0 ? (
+          <div className="mt-4 rounded-lg border border-dashed border-gray-300 p-6 text-center">
+            <p className="text-sm text-gray-700">No skin disease scans yet.</p>
+            <p className="text-sm text-gray-600 mt-1">
+              Run a scan from the skin disease detection page to save records here.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {skinRecords.slice(0, 5).map((rec) => (
+              <div
+                key={rec.id}
+                className="flex items-center gap-4 p-3 rounded-lg border border-gray-200"
+              >
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  {rec.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={rec.imageUrl} alt="Affected area" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl">🩺</span>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-semibold text-gray-900 truncate">{rec.disease}</div>
+                    <div className="text-xs text-gray-500 whitespace-nowrap">{formatDate(rec.createdAt)}</div>
+                  </div>
+                  <div className="mt-1 text-sm text-gray-600">
+                    Confidence:{' '}
+                    {rec.confidence != null ? `${(rec.confidence * 100).toFixed(1)}%` : '—'}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {skinRecords.length > 5 && (
+              <div className="text-sm text-gray-500">Showing 5 of {skinRecords.length} records.</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

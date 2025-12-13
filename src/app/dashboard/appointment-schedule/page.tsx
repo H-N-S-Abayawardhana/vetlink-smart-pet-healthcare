@@ -9,8 +9,8 @@ import Alert from '@/components/ui/Alert';
 
 interface Appointment {
   id: number;
-  user_id: number;
-  veterinarian_id: number;
+  user_id: string;
+  veterinarian_id: string;
   appointment_date: string;
   appointment_time: string;
   reason: string;
@@ -46,10 +46,14 @@ export default function AppointmentSchedulePage() {
       return;
     }
 
-    // Only USER role can access appointment scheduling
-    if (session.user.userRole !== 'USER') {
+    // USER can schedule; SUPER_ADMIN can view all appointments (read-only)
+    if (session.user.userRole !== 'USER' && session.user.userRole !== 'SUPER_ADMIN') {
       router.push('/dashboard');
       return;
+    }
+
+    if (session.user.userRole === 'SUPER_ADMIN') {
+      setActiveTab('list');
     }
 
     fetchAppointments();
@@ -105,18 +109,22 @@ export default function AppointmentSchedulePage() {
     );
   }
 
-  if (!session || session.user.userRole !== 'USER') {
+  if (!session || (session.user.userRole !== 'USER' && session.user.userRole !== 'SUPER_ADMIN')) {
     return null;
   }
+
+  const isSuperAdmin = session.user.userRole === 'SUPER_ADMIN';
 
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Appointment Scheduling
+          {isSuperAdmin ? 'Appointments' : 'Appointment Scheduling'}
         </h1>
         <p className="text-gray-600">
-          Schedule appointments with our veterinarians for your pet's health needs.
+          {isSuperAdmin
+            ? 'View all appointments across the system.'
+            : "Schedule appointments with our veterinarians for your pet's health needs."}
         </p>
       </div>
 
@@ -126,34 +134,36 @@ export default function AppointmentSchedulePage() {
         </Alert>
       )}
 
-      {/* Tab Navigation */}
-      <div className="mb-8">
-        <nav className="flex space-x-8">
-          <button
-            onClick={() => setActiveTab('schedule')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'schedule'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            Schedule New Appointment
-          </button>
-          <button
-            onClick={() => setActiveTab('list')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'list'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            My Appointments ({appointments.length})
-          </button>
-        </nav>
-      </div>
+      {/* Tab Navigation (USER only) */}
+      {!isSuperAdmin && (
+        <div className="mb-8">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('schedule')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'schedule'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Schedule New Appointment
+            </button>
+            <button
+              onClick={() => setActiveTab('list')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'list'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              My Appointments ({appointments.length})
+            </button>
+          </nav>
+        </div>
+      )}
 
       {/* Tab Content */}
-      {activeTab === 'schedule' && (
+      {!isSuperAdmin && activeTab === 'schedule' && (
         <AppointmentScheduler onAppointmentCreated={handleAppointmentCreated} />
       )}
 
@@ -163,6 +173,10 @@ export default function AppointmentSchedulePage() {
           onAppointmentUpdated={handleAppointmentUpdated}
           onAppointmentCancelled={handleAppointmentCancelled}
           onRefresh={fetchAppointments}
+          title={isSuperAdmin ? `All Appointments (${appointments.length})` : `My Appointments (${appointments.length})`}
+          emptyText={isSuperAdmin ? 'No appointments found in the system.' : "You haven't scheduled any appointments yet."}
+          showUserDetails={isSuperAdmin}
+          readOnly={isSuperAdmin}
         />
       )}
     </div>

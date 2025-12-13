@@ -2,16 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import MLApiService, { PredictionResult } from '@/services/mlApi';
+import type { Pet } from '@/lib/pets';
+import { createSkinDiseaseRecord } from '@/lib/skin-disease-records';
 import ImageUpload from './ImageUpload';
 import CameraCapture from './CameraCapture';
 
-export default function SkinAnalysis() {
+interface SkinAnalysisProps {
+  selectedPet?: Pet | null;
+  onChangePet?: () => void;
+  onClearPet?: () => void;
+}
+
+function getPetAvatarSrc(pet: Pet | null | undefined): string | null {
+  if (!pet) return null;
+  const anyPet = pet as any;
+  return anyPet.avatarDataUrl || anyPet.avatarUrl || null;
+}
+
+export default function SkinAnalysis({ selectedPet, onChangePet, onClearPet }: SkinAnalysisProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'camera'>('upload');
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Check API health on component mount
   useEffect(() => {
@@ -35,6 +51,8 @@ export default function SkinAnalysis() {
   const handleFileUpload = async (file: File) => {
     setError(null);
     setPrediction(null);
+    setSaveStatus('idle');
+    setSaveError(null);
 
     // Display image preview
     const reader = new FileReader();
@@ -48,6 +66,24 @@ export default function SkinAnalysis() {
     try {
       const result = await MLApiService.predictFromFile(file);
       setPrediction(result);
+
+      // Save scan record to pet history (best-effort) when a pet is selected
+      if (selectedPet?.id) {
+        setSaveStatus('saving');
+        try {
+          await createSkinDiseaseRecord(selectedPet.id, {
+            file,
+            disease: result.prediction.disease,
+            confidence: result.prediction.confidence,
+            allProbabilities: result.prediction.all_probabilities,
+          });
+          setSaveStatus('saved');
+        } catch (e) {
+          console.error('Failed saving skin disease record:', e);
+          setSaveStatus('error');
+          setSaveError(e instanceof Error ? e.message : 'Failed to save scan record');
+        }
+      }
     } catch (err) {
       setError(
         err instanceof Error 
@@ -63,6 +99,8 @@ export default function SkinAnalysis() {
   const handleCameraCapture = async (file: File) => {
     setError(null);
     setPrediction(null);
+    setSaveStatus('idle');
+    setSaveError(null);
 
     // Display image preview
     const reader = new FileReader();
@@ -76,6 +114,24 @@ export default function SkinAnalysis() {
     try {
       const result = await MLApiService.predictFromFile(file);
       setPrediction(result);
+
+      // Save scan record to pet history (best-effort) when a pet is selected
+      if (selectedPet?.id) {
+        setSaveStatus('saving');
+        try {
+          await createSkinDiseaseRecord(selectedPet.id, {
+            file,
+            disease: result.prediction.disease,
+            confidence: result.prediction.confidence,
+            allProbabilities: result.prediction.all_probabilities,
+          });
+          setSaveStatus('saved');
+        } catch (e) {
+          console.error('Failed saving skin disease record:', e);
+          setSaveStatus('error');
+          setSaveError(e instanceof Error ? e.message : 'Failed to save scan record');
+        }
+      }
     } catch (err) {
       setError(
         err instanceof Error 
@@ -93,6 +149,8 @@ export default function SkinAnalysis() {
     setPrediction(null);
     setError(null);
     setLoading(false);
+    setSaveStatus('idle');
+    setSaveError(null);
   };
 
   const formatDiseaseName = (disease: string) => {
@@ -114,6 +172,50 @@ export default function SkinAnalysis() {
             <p className="text-sm sm:text-base text-gray-600">
               Upload an image or use your camera to detect skin conditions using AI-powered analysis
             </p>
+
+            {(selectedPet || onChangePet || onClearPet) && (
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                {selectedPet ? (
+                  <div className="text-sm text-gray-700">
+                    <span className="font-semibold">Selected pet:</span> {selectedPet.name}
+                    {selectedPet.breed ? <span className="text-gray-500"> • {selectedPet.breed}</span> : null}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-700">
+                    <span className="font-semibold">Selected pet:</span> None (results will show only the affected photo)
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2">
+                  {onChangePet && (
+                    <button
+                      type="button"
+                      onClick={onChangePet}
+                      className="text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Change pet
+                    </button>
+                  )}
+                  {selectedPet && onClearPet && (
+                    <button
+                      type="button"
+                      onClick={onClearPet}
+                      className="text-sm text-gray-600 hover:text-gray-800 underline"
+                    >
+                      Clear selection
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!selectedPet && (
+              <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-blue-900 font-medium">
+                  Tip: Register/select your pet to automatically save scan history (date, detected condition, and affected photo) to the pet profile.
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex items-center space-x-2 flex-shrink-0">
             <div className={`w-3 h-3 rounded-full ${
@@ -197,17 +299,85 @@ export default function SkinAnalysis() {
       {/* Results Section */}
       {selectedImage && (
         <div className="space-y-4 sm:space-y-6">
-          {/* Image Preview */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-3 sm:p-4 bg-gray-50 border-b border-gray-200">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900">Analyzed Image</h2>
+          {/* Save Status (when pet selected) */}
+          {selectedPet && saveStatus !== 'idle' && (
+            <div
+              className={`rounded-lg border p-3 sm:p-4 text-sm ${
+                saveStatus === 'saving'
+                  ? 'bg-blue-50 border-blue-200 text-blue-800'
+                  : saveStatus === 'saved'
+                    ? 'bg-green-50 border-green-200 text-green-800'
+                    : 'bg-orange-50 border-orange-200 text-orange-800'
+              }`}
+            >
+              {saveStatus === 'saving' ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+                  <span>Saving this scan to {selectedPet.name}&apos;s history…</span>
+                </div>
+              ) : saveStatus === 'saved' ? (
+                <span>Saved to {selectedPet.name}&apos;s skin disease history.</span>
+              ) : (
+                <div className="space-y-1">
+                  <div>Couldn&apos;t save this scan to history (analysis result is still shown).</div>
+                  {saveError ? <div className="text-xs break-words opacity-90">{saveError}</div> : null}
+                </div>
+              )}
             </div>
-            <div className="p-3 sm:p-4 md:p-6">
-              <img
-                src={selectedImage}
-                alt="Analyzed"
-                className="w-full h-auto max-h-64 sm:max-h-80 md:max-h-96 object-contain rounded-lg"
-              />
+          )}
+
+          <div className={`grid gap-4 sm:gap-6 ${selectedPet ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+            {/* Pet Details (optional) */}
+            {selectedPet && (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="p-3 sm:p-4 bg-gray-50 border-b border-gray-200">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900">Pet Details</h2>
+                </div>
+                <div className="p-3 sm:p-4 md:p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      {getPetAvatarSrc(selectedPet) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={getPetAvatarSrc(selectedPet) as string}
+                          alt={`${selectedPet.name} photo`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-4xl">🐕</span>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="text-lg font-bold text-gray-900 truncate">{selectedPet.name}</div>
+                      <div className="mt-1 text-sm text-gray-700">
+                        <span className="font-semibold">Breed:</span> {selectedPet.breed || '—'}
+                      </div>
+                      <div className="mt-1 text-sm text-gray-700">
+                        <span className="font-semibold">Age:</span>{' '}
+                        {selectedPet.ageYears != null
+                          ? `${selectedPet.ageYears} ${selectedPet.ageYears === 1 ? 'year' : 'years'}`
+                          : '—'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Affected Photo */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="p-3 sm:p-4 bg-gray-50 border-b border-gray-200">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Affected Photo</h2>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={selectedImage}
+                  alt="Affected area"
+                  className="w-full h-auto max-h-64 sm:max-h-80 md:max-h-96 object-contain rounded-lg"
+                />
+              </div>
             </div>
           </div>
 

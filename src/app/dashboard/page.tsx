@@ -11,6 +11,15 @@ interface DashboardStats {
   aiAnalyses: number;
 }
 
+interface DashboardActivityItem {
+  type: 'user' | 'pet' | 'appointment' | 'ai_scan';
+  id: string;
+  ts: string; // ISO
+  title: string;
+  subtitle?: string | null;
+  href?: string | null;
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -23,6 +32,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [upcomingAppointments, setUpcomingAppointments] = useState<any[]>([]);
   const [recentPets, setRecentPets] = useState<any[]>([]);
+  const [activity, setActivity] = useState<DashboardActivityItem[]>([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -149,6 +159,19 @@ export default function DashboardPage() {
               setRecentPets(recent);
             }
           }
+
+          // Recent Activity Feed (SUPER_ADMIN only)
+          if (userRole === 'SUPER_ADMIN') {
+            const activityRes = await fetch('/api/dashboard/activity');
+            if (activityRes.ok) {
+              const data = await activityRes.json();
+              setActivity((data.items || []) as DashboardActivityItem[]);
+            } else {
+              setActivity([]);
+            }
+          } else {
+            setActivity([]);
+          }
         }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -177,6 +200,7 @@ export default function DashboardPage() {
   const userRole = (session.user as any)?.userRole || 'USER';
   const showRegisteredPetOwners = userRole === 'SUPER_ADMIN' || userRole === 'VETERINARIAN';
   const isUserRole = userRole === 'USER';
+  const isSuperAdmin = userRole === 'SUPER_ADMIN';
 
   // Stats configuration
   const statsConfig = [
@@ -472,7 +496,7 @@ export default function DashboardPage() {
                     ? "/dashboard/appointment-schedule"
                     : userRole === 'VETERINARIAN'
                     ? "/dashboard/veterinarian-appointments"
-                    : "/dashboard/appointments"
+                    : "/dashboard/appointment-schedule"
                 }
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
@@ -581,6 +605,109 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      )}
+
+      {/* Recent Activity Feed - Only visible for SUPER_ADMIN */}
+      {isSuperAdmin && (
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Recent Activity
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Latest users, pets, appointments, and AI scans across the system
+                </p>
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/dashboard/activity');
+                    if (res.ok) {
+                      const data = await res.json();
+                      setActivity((data.items || []) as DashboardActivityItem[]);
+                    }
+                  } catch (e) {
+                    console.error('Failed to refresh activity:', e);
+                  }
+                }}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <div className="mt-4">
+              {activity.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">
+                  No recent activity found.
+                </p>
+              ) : (
+                <div className="divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+                  {activity.map((item) => {
+                    const when = (() => {
+                      try {
+                        const d = new Date(item.ts);
+                        return d.toLocaleString();
+                      } catch {
+                        return item.ts;
+                      }
+                    })();
+
+                    const icon = item.type === 'user'
+                      ? '👤'
+                      : item.type === 'pet'
+                        ? '🐾'
+                        : item.type === 'appointment'
+                          ? '📅'
+                          : '🧠';
+
+                    const row = (
+                      <div className="flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors">
+                        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-lg">{icon}</span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-gray-500 whitespace-nowrap">
+                              {when}
+                            </p>
+                          </div>
+                          {item.subtitle && (
+                            <p className="mt-1 text-sm text-gray-600 truncate">
+                              {item.subtitle}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex-shrink-0">
+                          {item.href ? (
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          ) : null}
+                        </div>
+                      </div>
+                    );
+
+                    return item.href ? (
+                      <a key={`${item.type}-${item.id}`} href={item.href} className="block">
+                        {row}
+                      </a>
+                    ) : (
+                      <div key={`${item.type}-${item.id}`}>
+                        {row}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
