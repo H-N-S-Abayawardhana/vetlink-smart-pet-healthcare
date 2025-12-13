@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -31,32 +31,48 @@ export default function About() {
               Why Choose VetLink?
             </h2>
             <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-              VetLink represents the future of pet healthcare, combining cutting-edge artificial intelligence
-              with veterinary expertise to provide comprehensive, personalized care for your beloved pets.
+              VetLink represents the future of pet healthcare, combining
+              cutting-edge artificial intelligence with veterinary expertise to
+              provide comprehensive, personalized care for your beloved pets.
             </p>
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <CheckCircle className="mt-0.5 h-5 w-5 text-[#2DD4BF]" />
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-50">24/7 Health Monitoring</h3>
-                  <p className="text-gray-300">Continuous monitoring and instant alerts for any health concerns</p>
+                  <h3 className="text-lg font-semibold text-slate-50">
+                    24/7 Health Monitoring
+                  </h3>
+                  <p className="text-gray-300">
+                    Continuous monitoring and instant alerts for any health
+                    concerns
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <CheckCircle className="mt-0.5 h-5 w-5 text-[#2DD4BF]" />
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-50">AI-Powered Diagnostics</h3>
-                  <p className="text-gray-300">Advanced machine learning algorithms for accurate health assessments</p>
+                  <h3 className="text-lg font-semibold text-slate-50">
+                    AI-Powered Diagnostics
+                  </h3>
+                  <p className="text-gray-300">
+                    Advanced machine learning algorithms for accurate health
+                    assessments
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <CheckCircle className="mt-0.5 h-5 w-5 text-[#2DD4BF]" />
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-50">Personalized Care Plans</h3>
-                  <p className="text-gray-300">Tailored recommendations based on your pet's unique needs and health history</p>
+                  <h3 className="text-lg font-semibold text-slate-50">
+                    Personalized Care Plans
+                  </h3>
+                  <p className="text-gray-300">
+                    Tailored recommendations based on your pet’s unique needs
+                    and health history
+                  </p>
                 </div>
               </div>
             </div>
