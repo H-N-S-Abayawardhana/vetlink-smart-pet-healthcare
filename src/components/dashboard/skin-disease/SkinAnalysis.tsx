@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import MLApiService, { PredictionResult } from "@/services/mlApi";
+import MLApiService, {
+  PredictionResult,
+} from "@/services/skin-disease-detection/mlApi";
 import type { Pet } from "@/lib/pets";
 import { createSkinDiseaseRecord } from "@/lib/skin-disease-records";
 import ImageUpload from "./ImageUpload";
@@ -75,8 +77,14 @@ export default function SkinAnalysis({
       const result = await MLApiService.predictFromFile(file);
       setPrediction(result);
 
+      // If backend says image is invalid / not in-distribution, stop here.
+      if (result.valid === false) {
+        setLoading(false);
+        return;
+      }
+
       // Save scan record to pet history (best-effort) when a pet is selected
-      if (selectedPet?.id) {
+      if (selectedPet?.id && result.prediction) {
         setSaveStatus("saving");
         try {
           await createSkinDiseaseRecord(selectedPet.id, {
@@ -125,8 +133,14 @@ export default function SkinAnalysis({
       const result = await MLApiService.predictFromFile(file);
       setPrediction(result);
 
+      // If backend says image is invalid / not in-distribution, stop here.
+      if (result.valid === false) {
+        setLoading(false);
+        return;
+      }
+
       // Save scan record to pet history (best-effort) when a pet is selected
-      if (selectedPet?.id) {
+      if (selectedPet?.id && result.prediction) {
         setSaveStatus("saving");
         try {
           await createSkinDiseaseRecord(selectedPet.id, {
@@ -365,6 +379,54 @@ export default function SkinAnalysis({
       {/* Results Section */}
       {selectedImage && (
         <div className="space-y-4 sm:space-y-6">
+          {/* Invalid Image State (OOD gate) */}
+          {prediction?.valid === false && (
+            <div className="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-4 sm:p-6">
+              <div className="flex">
+                <svg
+                  className="h-5 w-5 sm:h-6 sm:w-6 text-orange-400 flex-shrink-0"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <div className="ml-3 flex-1">
+                  <h3 className="text-base sm:text-lg font-medium text-orange-800">
+                    Invalid image
+                  </h3>
+                  <p className="text-xs sm:text-sm text-orange-700 mt-1 break-words">
+                    {prediction.reason ||
+                      "This doesn’t look like a dog skin close-up. Please upload a clear photo of the affected skin area."}
+                  </p>
+                  <div className="mt-2 text-xs text-orange-700">
+                    Similarity:{" "}
+                    {prediction.similarity != null
+                      ? prediction.similarity.toFixed(3)
+                      : "—"}
+                    {prediction.threshold != null
+                      ? ` (threshold ${prediction.threshold.toFixed(3)})`
+                      : ""}
+                  </div>
+                  <div className="mt-3">
+                    <p className="text-xs sm:text-sm font-medium text-orange-800 mb-2">
+                      Tips:
+                    </p>
+                    <ul className="list-disc list-inside text-xs sm:text-sm text-orange-700 space-y-1">
+                      <li>Use good lighting (no flash)</li>
+                      <li>Fill the frame with the affected skin</li>
+                      <li>Avoid background objects and human skin</li>
+                      <li>Take 2–3 angles and choose the clearest</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Save Status (when pet selected) */}
           {selectedPet && saveStatus !== "idle" && (
             <div
@@ -523,7 +585,7 @@ export default function SkinAnalysis({
           )}
 
           {/* Prediction Results */}
-          {prediction && (
+          {prediction?.prediction && prediction.valid !== false && (
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-4 sm:p-6 md:p-8 border border-blue-200">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
                 <svg
