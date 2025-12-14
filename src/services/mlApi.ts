@@ -7,7 +7,11 @@ const API_BASE_URL =
 
 export interface PredictionResult {
   success: boolean;
-  prediction: {
+  valid?: boolean;
+  similarity?: number;
+  threshold?: number;
+  reason?: string;
+  prediction?: {
     disease: string;
     confidence: number;
     all_probabilities: Record<string, number>;
