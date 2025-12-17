@@ -14,9 +14,10 @@ async function readJson(p: string) {
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const pid = Number(params.id);
+    const { id } = await params;
+    const pid = Number(id);
     if (isNaN(pid)) return NextResponse.json({ error: 'Invalid pharmacy id' }, { status: 400 });
 
     const pharm = await readJson(PHARM_DATA);

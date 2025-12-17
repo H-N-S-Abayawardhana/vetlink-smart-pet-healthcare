@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { formatLKR } from '@/lib/currency';
 
 interface Product {
@@ -23,7 +24,7 @@ export default function ProductCard({ product, onAddToCart }: Props) {
       <div className="h-40 w-full bg-gray-100 rounded-md mb-3 flex items-center justify-center overflow-hidden">
         {product.image ? (
           // Images are placeholders — use local public files or external links
-          <img src={product.image} alt={product.name} className="object-cover h-full w-full" />
+          <Image src={product.image} alt={product.name} width={160} height={160} className="object-cover h-full w-full" />
         ) : (
           <div className="text-gray-400">No image</div>
         )}

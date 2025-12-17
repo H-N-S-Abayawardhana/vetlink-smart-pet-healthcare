@@ -17,10 +17,11 @@ async function writeData(data: any) {
   await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string, itemId: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string, itemId: string }> }) {
   try {
-    const pid = parseInt(params.id, 10);
-    const itemId = parseInt(params.itemId, 10);
+    const { id, itemId: itemIdParam } = await params;
+    const pid = parseInt(id, 10);
+    const itemId = parseInt(itemIdParam, 10);
     if (isNaN(pid) || isNaN(itemId)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
     const body = await request.json();
@@ -44,10 +45,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string, itemId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string, itemId: string }> }) {
   try {
-    const pid = parseInt(params.id, 10);
-    const itemId = parseInt(params.itemId, 10);
+    const { id, itemId: itemIdParam } = await params;
+    const pid = parseInt(id, 10);
+    const itemId = parseInt(itemIdParam, 10);
     if (isNaN(pid) || isNaN(itemId)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
     const data = await readData();

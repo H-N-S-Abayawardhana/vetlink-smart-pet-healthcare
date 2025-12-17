@@ -17,8 +17,9 @@ async function writeData(data: any) {
   await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const id = parseInt(params.id, 10);
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: paramId } = await params;
+  const id = parseInt(paramId, 10);
   if (isNaN(id)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
   const data = await readData();
@@ -29,9 +30,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // Add inventory item to pharmacy
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = parseInt(params.id, 10);
+    const { id: paramId } = await params;
+    const id = parseInt(paramId, 10);
     if (isNaN(id)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
     const body = await request.json();

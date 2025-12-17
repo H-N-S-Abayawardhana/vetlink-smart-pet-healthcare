@@ -64,7 +64,7 @@ export default function PharmacyPage() {
               </div>
               <div className="hidden md:flex items-center gap-3">
                 <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-                  <div className="text-xs text-blue-100">Today's Date</div>
+                  <div className="text-xs text-blue-100">Today&apos;s Date</div>
                   <div className="font-semibold">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
                 </div>
               </div>
