@@ -85,7 +85,7 @@ export async function POST(
     const expectedAmount = 50; // Default consultation fee - you can make this dynamic
     if (parseFloat(amount) !== expectedAmount) {
       return NextResponse.json(
-        { error: `Invalid amount. Expected $${expectedAmount}` },
+        { error: `Invalid amount. Expected LKR ${expectedAmount.toFixed(2)}` },
         { status: 400 },
       );
     }

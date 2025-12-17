@@ -12,6 +12,7 @@ export const rolePermissions = {
       "/",
       "/dashboard",
       "/dashboard/profile",
+      '/dashboard/pharmacy',
       "/dashboard/skin-disease",
       "/dashboard/Limping/",
       "/dashboard/pets",
@@ -26,7 +27,8 @@ export const rolePermissions = {
       "/dashboard",
       "/dashboard/pets",
       "/dashboard/skin-disease",
-      "/dashboard/appointment-schedule",
+      "/dashboard/appointment-schedule",,
+      '/dashboard/pharmacy'
     ],
     description: "Basic user access with appointment scheduling",
   },
