@@ -37,10 +37,7 @@ export default function Contact() {
   };
 
   return (
-    <section
-      id="contact"
-      className="relative overflow-hidden py-20 bg-gray-50"
-    >
+    <section id="contact" className="relative overflow-hidden py-20 bg-gray-50">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 right-[-10rem] h-80 w-[42rem] rounded-full bg-blue-50/40 blur-3xl" />
         <div className="absolute -bottom-24 left-[-10rem] h-80 w-[42rem] rounded-full bg-blue-100/30 blur-3xl" />
@@ -101,8 +98,8 @@ export default function Contact() {
               </div>
 
               <p className="text-gray-600 leading-relaxed mb-7">
-                Have questions about VetLink? We&apos;d love to hear from you. Send
-                us a message and we&apos;ll respond as soon as possible.
+                Have questions about VetLink? We&apos;d love to hear from you.
+                Send us a message and we&apos;ll respond as soon as possible.
               </p>
 
               <div className="space-y-4">

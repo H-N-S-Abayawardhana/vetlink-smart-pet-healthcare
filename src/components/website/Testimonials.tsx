@@ -104,9 +104,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-600 italic leading-relaxed">
-                &quot;The anomaly detection system alerted me when my cat started
-                limping. Early detection meant faster treatment and a quicker
-                recovery.&quot;
+                &quot;The anomaly detection system alerted me when my cat
+                started limping. Early detection meant faster treatment and a
+                quicker recovery.&quot;
               </p>
             </motion.div>
 
@@ -140,9 +140,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-600 italic leading-relaxed">
-                &quot;The AI diet plans have been a game-changer for my pets&apos;
-                health. Each of my three pets has a personalized nutrition plan
-                that works perfectly!&quot;
+                &quot;The AI diet plans have been a game-changer for my
+                pets&apos; health. Each of my three pets has a personalized
+                nutrition plan that works perfectly!&quot;
               </p>
             </motion.div>
 
@@ -176,9 +176,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-600 italic leading-relaxed">
-                &quot;The health monitoring dashboard gives me peace of mind. I can
-                track my dog&apos;s activity levels, sleep patterns, and overall
-                wellness trends all in one place.&quot;
+                &quot;The health monitoring dashboard gives me peace of mind. I
+                can track my dog&apos;s activity levels, sleep patterns, and
+                overall wellness trends all in one place.&quot;
               </p>
             </motion.div>
 
@@ -244,9 +244,9 @@ export default function Testimonials() {
                 </div>
               </div>
               <p className="text-gray-600 italic leading-relaxed">
-                &quot;As my dog ages, VetLink&apos;s senior care features have been
-                invaluable. The medication reminders and health alerts help me
-                provide the best care for my 12-year-old companion.&quot;
+                &quot;As my dog ages, VetLink&apos;s senior care features have
+                been invaluable. The medication reminders and health alerts help
+                me provide the best care for my 12-year-old companion.&quot;
               </p>
             </motion.div>
           </div>

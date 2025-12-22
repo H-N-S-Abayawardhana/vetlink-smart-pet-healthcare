@@ -5,7 +5,10 @@ import pool from "@/lib/db";
 import { mapRowToPet } from "@/lib/pet-utils";
 
 // GET /api/pets/:id
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -43,7 +46,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // PUT /api/pets/:id
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -63,11 +69,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const userRole = (session.user as any)?.userRole;
     // Cast owner_id to text to match UUID string from session
     const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
-    if (
-      ownerIdStr !== session.user.id &&
-      userRole !== "SUPER_ADMIN" &&
-      userRole !== "VETERINARIAN"
-    ) {
+    // Only owners and SUPER_ADMIN can edit pets, not VETERINARIAN
+    if (ownerIdStr !== session.user.id && userRole !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -143,11 +146,8 @@ export async function DELETE(
     const userRole = (session.user as any)?.userRole;
     // Cast owner_id to text to match UUID string from session
     const ownerIdStr = pet.owner_id ? String(pet.owner_id) : null;
-    if (
-      ownerIdStr !== session.user.id &&
-      userRole !== "SUPER_ADMIN" &&
-      userRole !== "VETERINARIAN"
-    ) {
+    // Only owners and SUPER_ADMIN can delete pets, not VETERINARIAN
+    if (ownerIdStr !== session.user.id && userRole !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -163,7 +163,10 @@ export async function DELETE(
 }
 
 // PATCH /api/pets/:id - partial update
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -182,11 +185,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const userRole = (session.user as any)?.userRole;
     // Cast owner_id to text to match UUID string from session
     const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
-    if (
-      ownerIdStr !== session.user.id &&
-      userRole !== "SUPER_ADMIN" &&
-      userRole !== "VETERINARIAN"
-    ) {
+    // Only owners and SUPER_ADMIN can patch pets, not VETERINARIAN
+    if (ownerIdStr !== session.user.id && userRole !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

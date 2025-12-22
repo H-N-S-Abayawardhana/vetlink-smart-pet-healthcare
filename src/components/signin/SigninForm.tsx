@@ -97,18 +97,18 @@ export default function SigninForm() {
   // Show loading state while checking session or if user is already logged in
   if (status === "loading" || session) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <div className="flex w-full lg:w-1/2 flex-col justify-center px-4 py-8 sm:py-12 sm:px-6 lg:px-16 xl:px-20 bg-white">
+    <div className="flex min-h-screen bg-gray-50">
+      <div className="flex w-full lg:w-1/2 flex-col justify-center px-4 py-8 sm:py-12 sm:px-6 lg:px-16 xl:px-20">
         <div className="mx-auto w-full max-w-md lg:w-full lg:max-w-lg">
           <div>
-            <div className="flex items-center justify-center sm:justify-start">
+            <div className="flex items-center justify-center sm:justify-start mb-8">
               <div className="flex-shrink-0">
                 <Link href="/" passHref>
                   <Image
@@ -122,14 +122,14 @@ export default function SigninForm() {
                 </Link>
               </div>
             </div>
-            <h2 className="mt-6 sm:mt-8 text-xl sm:text-2xl/9 font-bold tracking-tight text-gray-900 text-center sm:text-left">
+            <h2 className="mt-6 sm:mt-8 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 text-center sm:text-left">
               Sign in to your account
             </h2>
-            <p className="mt-2 text-sm/6 text-gray-500 text-center sm:text-left">
+            <p className="mt-3 text-sm text-gray-600 text-center sm:text-left">
               Not a member?{" "}
               <a
                 href="/signup"
-                className="font-semibold text-blue-600 hover:text-blue-500"
+                className="font-semibold text-blue-700 hover:text-blue-600 transition-colors"
               >
                 Sign up for free
               </a>
@@ -175,7 +175,7 @@ export default function SigninForm() {
                       required
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors shadow-sm"
                       placeholder="Enter your email"
                     />
                   </div>
@@ -197,7 +197,7 @@ export default function SigninForm() {
                       required
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="block w-full rounded-lg bg-white px-4 py-3 text-base text-gray-900 border border-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors shadow-sm"
                       placeholder="Enter your password"
                     />
                   </div>
@@ -246,12 +246,12 @@ export default function SigninForm() {
                   </div>
 
                   <div className="text-sm/6">
-                    <a
-                      href="#"
-                      className="font-semibold text-blue-600 hover:text-blue-500"
+                    <Link
+                      href="/forgot-password"
+                      className="font-semibold text-blue-700 hover:text-blue-600 transition-colors"
                     >
                       Forgot password?
-                    </a>
+                    </Link>
                   </div>
                 </div>
 
@@ -259,7 +259,7 @@ export default function SigninForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex w-full justify-center rounded-lg bg-blue-600 px-4 py-3 text-base font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    className="flex w-full justify-center rounded-lg bg-gradient-to-r from-blue-700 to-blue-600 px-4 py-3 text-base font-semibold text-white shadow-sm hover:from-blue-800 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
                   >
                     {isLoading ? "Signing in..." : "Sign in"}
                   </button>
@@ -276,7 +276,7 @@ export default function SigninForm() {
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-sm/6 font-medium">
-                  <span className="bg-white px-6 text-gray-900">
+                  <span className="bg-gray-50 px-6 text-gray-900">
                     Or continue with
                   </span>
                 </div>
@@ -286,7 +286,7 @@ export default function SigninForm() {
                 <button
                   type="button"
                   onClick={handleGoogleSignIn}
-                  className="flex w-full items-center justify-center gap-3 rounded-lg bg-white px-4 py-3 text-base font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors cursor-pointer"
+                  className="flex w-full items-center justify-center gap-3 rounded-lg bg-white px-4 py-3 text-base font-semibold text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all cursor-pointer shadow-sm"
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -321,7 +321,42 @@ export default function SigninForm() {
       </div>
 
       <div className="relative hidden lg:block lg:w-1/2 lg:h-screen">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-white h-full"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-blue-100/50 to-gray-50 h-full">
+          {/* Subtle blur effects */}
+          <div className="absolute -top-24 left-1/2 h-80 w-[44rem] -translate-x-1/2 rounded-full bg-blue-100/40 blur-3xl" />
+          <div className="absolute -bottom-28 right-[-10rem] h-80 w-[44rem] rounded-full bg-blue-50/50 blur-3xl" />
+
+          {/* Content overlay */}
+          <div className="absolute inset-0 flex items-center justify-center p-12">
+            <div className="max-w-md text-center">
+              <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 ring-1 ring-blue-200 mb-6">
+                <svg
+                  className="h-4 w-4 text-blue-700"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Premium AI Pet Healthcare
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 bg-clip-text text-transparent">
+                  Welcome Back
+                </span>
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Access your pet&apos;s health records, AI-powered diagnostics,
+                and personalized care plans all in one place.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

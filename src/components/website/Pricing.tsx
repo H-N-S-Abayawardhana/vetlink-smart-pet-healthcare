@@ -5,10 +5,7 @@ import { CheckCircle, Sparkles } from "lucide-react";
 
 export default function Pricing() {
   return (
-    <section
-      id="pricing"
-      className="relative overflow-hidden py-20 bg-gray-50"
-    >
+    <section id="pricing" className="relative overflow-hidden py-20 bg-gray-50">
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-blue-100/40 blur-3xl" />

@@ -225,4 +225,72 @@ export async function sendAppointmentStatusToUser(data: AppointmentEmailData) {
   }
 }
 
+// Send password reset email
+export interface PasswordResetEmailData {
+  email: string;
+  username: string;
+  resetUrl: string;
+}
+
+export async function sendPasswordResetEmail(data: PasswordResetEmailData) {
+  try {
+    const mailOptions = {
+      from: `"VetLink" <${process.env.SMTP_FROM_EMAIL}>`,
+      to: data.email,
+      subject: "Reset Your VetLink Password",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">Password Reset Request</h2>
+            
+            <div style="background-color: white; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+              <p style="color: #333; line-height: 1.6;">
+                Hello ${data.username},
+              </p>
+              <p style="color: #333; line-height: 1.6;">
+                We received a request to reset your password for your VetLink account. Click the button below to reset your password:
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${data.resetUrl}" 
+                   style="display: inline-block; background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                  Reset Password
+                </a>
+              </div>
+              
+              <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                Or copy and paste this link into your browser:
+              </p>
+              <p style="color: #2563eb; font-size: 12px; word-break: break-all; background-color: #f0f0f0; padding: 10px; border-radius: 4px;">
+                ${data.resetUrl}
+              </p>
+              
+              <p style="color: #666; font-size: 14px; line-height: 1.6; margin-top: 20px;">
+                This link will expire in 1 hour for security reasons.
+              </p>
+              
+              <p style="color: #666; font-size: 14px; line-height: 1.6; margin-top: 20px;">
+                If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
+              </p>
+            </div>
+            
+            <div style="background-color: #e3f2fd; padding: 15px; border-radius: 6px; border-left: 4px solid #2563eb;">
+              <p style="margin: 0; color: #1565c0; font-size: 14px;">
+                <strong>Security Tip:</strong> Never share your password reset link with anyone. VetLink will never ask for your password.
+              </p>
+            </div>
+          </div>
+        </div>
+      `,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log("Password reset email sent:", result.messageId);
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    return { success: false, error: error };
+  }
+}
+
 export default transporter;

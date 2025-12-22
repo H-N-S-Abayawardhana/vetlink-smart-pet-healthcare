@@ -70,8 +70,8 @@ export default function About() {
                     Personalized Care Plans
                   </h3>
                   <p className="text-gray-600">
-                    Tailored recommendations based on your pet&apos;s unique needs
-                    and health history
+                    Tailored recommendations based on your pet&apos;s unique
+                    needs and health history
                   </p>
                 </div>
               </div>

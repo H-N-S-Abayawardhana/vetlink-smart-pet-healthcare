@@ -9,6 +9,8 @@ import {
   type SkinDiseaseRecord,
 } from "@/lib/skin-disease-records";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { UserRole } from "@/types/next-auth";
 
 interface PetProfileProps {
   pet: Pet;
@@ -16,6 +18,9 @@ interface PetProfileProps {
 
 export default function PetProfile({ pet }: PetProfileProps) {
   const router = useRouter();
+  const { data: session } = useSession();
+  const userRole = ((session?.user as any)?.userRole as UserRole) || "USER";
+  const isVeterinarian = userRole === "VETERINARIAN";
   const [skinRecords, setSkinRecords] = useState<SkinDiseaseRecord[]>([]);
   const [skinLoading, setSkinLoading] = useState(false);
 
@@ -84,25 +89,27 @@ export default function PetProfile({ pet }: PetProfileProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link
-            href={`/dashboard/pets/${pet.id}/edit`}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {!isVeterinarian && (
+            <Link
+              href={`/dashboard/pets/${pet.id}/edit`}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              />
-            </svg>
-            Edit
-          </Link>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Edit
+            </Link>
+          )}
           <button
             onClick={() => router.push("/dashboard/pets")}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
