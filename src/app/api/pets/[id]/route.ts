@@ -69,11 +69,8 @@ export async function PUT(
     const userRole = (session.user as any)?.userRole;
     // Cast owner_id to text to match UUID string from session
     const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
-    if (
-      ownerIdStr !== session.user.id &&
-      userRole !== "SUPER_ADMIN" &&
-      userRole !== "VETERINARIAN"
-    ) {
+    // Only owners and SUPER_ADMIN can edit pets, not VETERINARIAN
+    if (ownerIdStr !== session.user.id && userRole !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -149,11 +146,8 @@ export async function DELETE(
     const userRole = (session.user as any)?.userRole;
     // Cast owner_id to text to match UUID string from session
     const ownerIdStr = pet.owner_id ? String(pet.owner_id) : null;
-    if (
-      ownerIdStr !== session.user.id &&
-      userRole !== "SUPER_ADMIN" &&
-      userRole !== "VETERINARIAN"
-    ) {
+    // Only owners and SUPER_ADMIN can delete pets, not VETERINARIAN
+    if (ownerIdStr !== session.user.id && userRole !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -191,11 +185,8 @@ export async function PATCH(
     const userRole = (session.user as any)?.userRole;
     // Cast owner_id to text to match UUID string from session
     const ownerIdStr = petRow.owner_id ? String(petRow.owner_id) : null;
-    if (
-      ownerIdStr !== session.user.id &&
-      userRole !== "SUPER_ADMIN" &&
-      userRole !== "VETERINARIAN"
-    ) {
+    // Only owners and SUPER_ADMIN can patch pets, not VETERINARIAN
+    if (ownerIdStr !== session.user.id && userRole !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

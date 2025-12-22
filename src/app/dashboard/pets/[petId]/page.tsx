@@ -13,8 +13,8 @@ export default function PetDetailPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const userRole = ((session?.user as any)?.userRole as UserRole) || "USER";
-  const blockPetProfile =
-    userRole === "SUPER_ADMIN" || userRole === "VETERINARIAN";
+  // Only block SUPER_ADMIN, allow VETERINARIAN to view pet details
+  const blockPetProfile = userRole === "SUPER_ADMIN";
 
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);

@@ -14,10 +14,11 @@ export default function PetListItem({ pet }: PetListItemProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const userRole = ((session?.user as any)?.userRole as UserRole) || "USER";
-  const isAdminPetsView =
-    userRole === "SUPER_ADMIN" || userRole === "VETERINARIAN";
+  const isAdminPetsView = userRole === "SUPER_ADMIN";
+  const isVeterinarian = userRole === "VETERINARIAN";
 
   const handleClick = () => {
+    // Allow veterinarians to click and view pet details, but not SUPER_ADMIN
     if (isAdminPetsView) return;
     router.push(`/dashboard/pets/${pet.id}`);
   };
@@ -57,7 +58,7 @@ export default function PetListItem({ pet }: PetListItemProps) {
             <span className="text-xs text-gray-500 capitalize">{pet.type}</span>
           )}
         </div>
-        {isAdminPetsView &&
+        {(isAdminPetsView || isVeterinarian) &&
           (pet.ownerUsername || pet.ownerEmail || pet.ownerId) && (
             <div className="mt-0.5 text-xs text-gray-500 truncate">
               Owner:{" "}

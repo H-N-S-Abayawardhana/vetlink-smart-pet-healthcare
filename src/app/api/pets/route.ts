@@ -52,16 +52,31 @@ export async function GET(request: NextRequest) {
     if (userRole === "VETERINARIAN") {
       if (typeFilter) {
         const result = await pool.query(
-          "SELECT * FROM pets WHERE type = $1 ORDER BY created_at DESC",
+          `SELECT p.*, u.username AS owner_username, u.email AS owner_email
+           FROM pets p
+           LEFT JOIN users u ON u.id::text = p.owner_id::text
+           WHERE p.type = $1
+           ORDER BY p.created_at DESC`,
           [typeFilter],
         );
-        const pets = result.rows.map(mapRowToPet);
+        const pets = result.rows.map((row) => ({
+          ...mapRowToPet(row),
+          ownerUsername: row.owner_username ?? null,
+          ownerEmail: row.owner_email ?? null,
+        }));
         return NextResponse.json({ pets });
       }
       const result = await pool.query(
-        "SELECT * FROM pets ORDER BY created_at DESC",
+        `SELECT p.*, u.username AS owner_username, u.email AS owner_email
+         FROM pets p
+         LEFT JOIN users u ON u.id::text = p.owner_id::text
+         ORDER BY p.created_at DESC`,
       );
-      const pets = result.rows.map(mapRowToPet);
+      const pets = result.rows.map((row) => ({
+        ...mapRowToPet(row),
+        ownerUsername: row.owner_username ?? null,
+        ownerEmail: row.owner_email ?? null,
+      }));
       return NextResponse.json({ pets });
     }
 
