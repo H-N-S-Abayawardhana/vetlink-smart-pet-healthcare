@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
       exercise_level,
       environment,
       pet_id,
-      use_mock, // Flag to use mock prediction during development
     } = body;
 
     // Validate required fields
@@ -136,20 +135,16 @@ export async function POST(request: NextRequest) {
       pet_id,
     };
 
-    // Call the prediction API (use mock if specified or in development)
+    // Call the Hugging Face prediction API
     let result;
     try {
-      if (use_mock || process.env.NODE_ENV === 'development') {
-        // Use mock prediction during development
-        result = await MultiDiseaseApiService.mockPredict(input);
-      } else {
-        // Use real API in production
-        result = await MultiDiseaseApiService.predictDiseases(input);
-      }
+      result = await MultiDiseaseApiService.predictDiseases(input);
     } catch (apiError) {
       console.error('Disease prediction API error:', apiError);
-      // Fallback to mock if real API fails
-      result = await MultiDiseaseApiService.mockPredict(input);
+      return NextResponse.json(
+        { error: 'Failed to connect to prediction service. Please try again later.' },
+        { status: 503 }
+      );
     }
 
     if (result.error) {

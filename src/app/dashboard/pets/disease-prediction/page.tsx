@@ -58,10 +58,7 @@ export default function DiseasePredictionPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...apiInput,
-          use_mock: true, // Use mock during development
-        }),
+        body: JSON.stringify(apiInput),
       });
 
       if (!response.ok) {
