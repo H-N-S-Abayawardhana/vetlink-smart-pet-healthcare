@@ -30,11 +30,14 @@ export default function DiseasePredictionForm({
   petAge,
   petGender,
 }: DiseasePredictionFormProps) {
+  // BCS is required - if not available, show error
+  const hasBCS = initialBCS !== null && initialBCS !== undefined;
+
   const [formData, setFormData] = useState<DiseasePredictionFormState>(() => {
     const initial = { ...initialFormState };
     
     // Pre-fill from pet data if available
-    if (initialBCS !== null && initialBCS !== undefined) {
+    if (hasBCS) {
       initial.body_condition_score = initialBCS;
     }
     if (petAge !== null && petAge !== undefined) {
@@ -53,7 +56,7 @@ export default function DiseasePredictionForm({
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 3; // Reduced from 4 since BCS is now read-only
 
   // Validation
   const isStep1Valid = () => {
@@ -67,10 +70,6 @@ export default function DiseasePredictionForm({
   };
 
   const isStep2Valid = () => {
-    return formData.body_condition_score !== null;
-  };
-
-  const isStep3Valid = () => {
     return (
       formData.pale_gums !== '' &&
       formData.skin_lesions !== '' &&
@@ -78,7 +77,7 @@ export default function DiseasePredictionForm({
     );
   };
 
-  const isStep4Valid = () => {
+  const isStep3Valid = () => {
     return (
       formData.tick_prevention !== '' &&
       formData.heartworm_prevention !== '' &&
@@ -93,14 +92,13 @@ export default function DiseasePredictionForm({
       case 1: return isStep1Valid();
       case 2: return isStep2Valid();
       case 3: return isStep3Valid();
-      case 4: return isStep4Valid();
       default: return false;
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isStep1Valid() && isStep2Valid() && isStep3Valid() && isStep4Valid()) {
+    if (hasBCS && isStep1Valid() && isStep2Valid() && isStep3Valid()) {
       onSubmit(formData);
     }
   };
@@ -117,12 +115,12 @@ export default function DiseasePredictionForm({
     }
   };
 
-  // BCS visual selector
+  // BCS display helper
   const getBCSColor = (score: number) => {
-    if (score <= 3) return 'bg-orange-400 hover:bg-orange-500';
-    if (score <= 5) return 'bg-green-500 hover:bg-green-600';
-    if (score <= 7) return 'bg-amber-400 hover:bg-amber-500';
-    return 'bg-red-500 hover:bg-red-600';
+    if (score <= 3) return 'bg-orange-400';
+    if (score <= 5) return 'bg-green-500';
+    if (score <= 7) return 'bg-amber-400';
+    return 'bg-red-500';
   };
 
   const getBCSLabel = (score: number) => {
@@ -131,6 +129,53 @@ export default function DiseasePredictionForm({
     if (score <= 7) return 'Overweight';
     return 'Obese';
   };
+
+  const getBCSBorderColor = (score: number) => {
+    if (score <= 3) return 'border-orange-300';
+    if (score <= 5) return 'border-green-300';
+    if (score <= 7) return 'border-amber-300';
+    return 'border-red-300';
+  };
+
+  const getBCSBgColor = (score: number) => {
+    if (score <= 3) return 'bg-orange-50';
+    if (score <= 5) return 'bg-green-50';
+    if (score <= 7) return 'bg-amber-50';
+    return 'bg-red-50';
+  };
+
+  const getBCSTextColor = (score: number) => {
+    if (score <= 3) return 'text-orange-700';
+    if (score <= 5) return 'text-green-700';
+    if (score <= 7) return 'text-amber-700';
+    return 'text-red-700';
+  };
+
+  // If no BCS, show error state
+  if (!hasBCS) {
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto p-8 text-center">
+          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-amber-600" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            BCS Required
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Please calculate the Body Condition Score (BCS) for {petName || 'your pet'} first 
+            before running the disease risk assessment.
+          </p>
+          <button
+            onClick={onCancel}
+            className="px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors"
+          >
+            Go to BCS Calculator
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
@@ -173,6 +218,28 @@ export default function DiseasePredictionForm({
         </div>
 
         <form onSubmit={handleSubmit} className="p-8">
+          {/* BCS Display Card - Read-only from database */}
+          <div className={`mb-6 p-4 rounded-xl border-2 ${getBCSBorderColor(initialBCS)} ${getBCSBgColor(initialBCS)}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 ${getBCSColor(initialBCS)} rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
+                  {initialBCS}
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Body Condition Score</p>
+                  <p className={`font-bold text-lg ${getBCSTextColor(initialBCS)}`}>
+                    {getBCSLabel(initialBCS)} ({initialBCS}/9)
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/80 rounded-lg text-sm text-gray-600">
+                  <span>📊</span> From Pet Profile
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Info banner */}
           <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg">
             <div className="flex gap-3">
@@ -290,80 +357,8 @@ export default function DiseasePredictionForm({
             </div>
           )}
 
-          {/* Step 2: Health Metrics (BCS) */}
+          {/* Step 2: Clinical Signs */}
           {currentStep === 2 && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-                ⚖️ Body Condition Score
-              </h3>
-
-              {initialBCS && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-xl mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600 font-semibold">✅ Pre-filled from BCS Calculator:</span>
-                    <span className="text-green-800 font-bold text-lg">{initialBCS}/9</span>
-                  </div>
-                </div>
-              )}
-
-              <p className="text-gray-600 mb-4">
-                Select the Body Condition Score (1-9 scale). This measures if the pet is underweight, 
-                ideal, or overweight.
-              </p>
-
-              <div className="grid grid-cols-9 gap-2 mb-4">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((score) => (
-                  <button
-                    key={score}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, body_condition_score: score })}
-                    className={`aspect-square rounded-xl font-bold text-lg transition-all transform hover:scale-110 ${
-                      formData.body_condition_score === score
-                        ? `${getBCSColor(score)} text-white shadow-lg scale-110 ring-4 ring-offset-2 ring-purple-400`
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {score}
-                  </button>
-                ))}
-              </div>
-
-              <div className="bg-gradient-to-r from-orange-100 via-green-100 to-red-100 rounded-xl p-4">
-                <div className="flex justify-between text-sm font-semibold">
-                  <span className="text-orange-600">1-3: Underweight</span>
-                  <span className="text-green-600">4-5: Ideal</span>
-                  <span className="text-amber-600">6-7: Overweight</span>
-                  <span className="text-red-600">8-9: Obese</span>
-                </div>
-              </div>
-
-              {formData.body_condition_score && (
-                <div className={`p-4 rounded-xl border-2 ${
-                  formData.body_condition_score <= 3 ? 'bg-orange-50 border-orange-200' :
-                  formData.body_condition_score <= 5 ? 'bg-green-50 border-green-200' :
-                  formData.body_condition_score <= 7 ? 'bg-amber-50 border-amber-200' :
-                  'bg-red-50 border-red-200'
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-800">
-                      Selected: {formData.body_condition_score}/9
-                    </span>
-                    <span className={`font-bold ${
-                      formData.body_condition_score <= 3 ? 'text-orange-600' :
-                      formData.body_condition_score <= 5 ? 'text-green-600' :
-                      formData.body_condition_score <= 7 ? 'text-amber-600' :
-                      'text-red-600'
-                    }`}>
-                      {getBCSLabel(formData.body_condition_score)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Step 3: Clinical Signs */}
-          {currentStep === 3 && (
             <div className="space-y-6">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
                 🩺 Clinical Signs (Symptoms)
@@ -482,8 +477,8 @@ export default function DiseasePredictionForm({
             </div>
           )}
 
-          {/* Step 4: Prevention & Care */}
-          {currentStep === 4 && (
+          {/* Step 3: Prevention & Care */}
+          {currentStep === 3 && (
             <div className="space-y-6">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
                 🛡️ Prevention & Care

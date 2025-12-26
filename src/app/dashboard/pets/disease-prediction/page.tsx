@@ -208,7 +208,14 @@ export default function DiseasePredictionPage() {
                   <p className="text-gray-500">Loading your pets...</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <>
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>Note:</strong> Only pets with a calculated Body Condition Score (BCS) can be assessed. 
+                      Please calculate BCS first if needed.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {pets.map((pet) => {
                     const avatar =
                       (pet as any).avatarDataUrl ||
@@ -219,15 +226,19 @@ export default function DiseasePredictionPage() {
                     const hasAvatar = Boolean(
                       (pet as any).avatarDataUrl || (pet as any).avatarUrl
                     );
+                    const hasBCS = pet.bcs !== null && pet.bcs !== undefined;
 
                     return (
                       <button
                         key={pet.id}
                         onClick={() => onSelectPet(pet)}
+                        disabled={!hasBCS}
                         className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
-                          selected?.id === pet.id
-                            ? 'border-purple-500 bg-purple-50 shadow-lg'
-                            : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/50'
+                          !hasBCS
+                            ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                            : selected?.id === pet.id
+                              ? 'border-purple-500 bg-purple-50 shadow-lg'
+                              : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/50'
                         }`}
                       >
                         {hasAvatar ? (
@@ -249,17 +260,22 @@ export default function DiseasePredictionPage() {
                           <p className="text-sm text-gray-600">
                             {pet.breed || pet.type} • {pet.ageYears ? `${pet.ageYears} years` : 'Age unknown'}
                           </p>
-                          {pet.bcs && (
+                          {hasBCS ? (
                             <p className="text-xs text-purple-600 font-medium mt-1">
-                              BCS: {pet.bcs}/9
+                              ✅ BCS: {pet.bcs}/9
+                            </p>
+                          ) : (
+                            <p className="text-xs text-amber-600 font-medium mt-1">
+                              ⚠️ BCS not calculated
                             </p>
                           )}
                         </div>
-                        <ChevronRight className="w-5 h-5 text-gray-400" />
+                        <ChevronRight className={`w-5 h-5 ${hasBCS ? 'text-gray-400' : 'text-gray-300'}`} />
                       </button>
                     );
                   })}
-                </div>
+                  </div>
+                </>
               )}
             </div>
           )}
