@@ -277,7 +277,7 @@ export default function DiseasePredictionForm({
                     type="number"
                     min="0"
                     max="30"
-                    step="0.5"
+                    step="1"
                     required
                     value={formData.age_years}
                     onChange={(e) => setFormData({ ...formData, age_years: e.target.value })}
