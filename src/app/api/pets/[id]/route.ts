@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import pool from "@/lib/db";
 import { mapRowToPet } from "@/lib/pet-utils";
+import {
+  deleteFromS3ByUrl,
+  deleteMultipleFromS3ByUrls,
+  isS3Url,
+} from "@/lib/s3";
 
 // GET /api/pets/:id
 export async function GET(
@@ -151,6 +156,45 @@ export async function DELETE(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    // Collect all S3 URLs to delete
+    const s3UrlsToDelete: string[] = [];
+
+    // 1. Delete pet avatar if it's an S3 URL
+    if (pet.avatar_url && isS3Url(pet.avatar_url)) {
+      s3UrlsToDelete.push(pet.avatar_url);
+    }
+
+    // 2. Delete all skin disease images from S3
+    if (pet.skin_disease_history) {
+      try {
+        const history = Array.isArray(pet.skin_disease_history)
+          ? pet.skin_disease_history
+          : [];
+
+        history.forEach((record: any) => {
+          if (record?.imageUrl && isS3Url(record.imageUrl)) {
+            s3UrlsToDelete.push(record.imageUrl);
+          }
+        });
+      } catch (e) {
+        console.error("Error parsing skin_disease_history:", e);
+      }
+    }
+
+    // Delete all S3 objects
+    if (s3UrlsToDelete.length > 0) {
+      try {
+        const deletedCount = await deleteMultipleFromS3ByUrls(s3UrlsToDelete);
+        console.log(
+          `Deleted ${deletedCount} of ${s3UrlsToDelete.length} S3 objects for pet ${id}`,
+        );
+      } catch (e) {
+        console.error("Error deleting S3 objects:", e);
+        // Continue with database deletion even if S3 deletion fails
+      }
+    }
+
+    // Delete from database (cascade will handle related records)
     await pool.query("DELETE FROM pets WHERE id = $1", [id]);
     return NextResponse.json({ message: "Pet deleted" });
   } catch (error) {
