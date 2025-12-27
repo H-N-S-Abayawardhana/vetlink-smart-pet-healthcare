@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import {
   Plus,
@@ -78,12 +78,31 @@ export default function PharmacyInventoryPage() {
     }
   }, [session]);
 
+  const fetchInventory = useCallback(async () => {
+    if (!pharmacyId) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/pharmacies/${pharmacyId}/inventory`);
+      const data = await res.json();
+      if (res.ok) {
+        setInventory(data.inventory || []);
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to load inventory" });
+      }
+    } catch (err) {
+      console.error("Failed to fetch inventory:", err);
+      setMessage({ type: "error", text: "Failed to load inventory" });
+    } finally {
+      setLoading(false);
+    }
+  }, [pharmacyId]);
+
   // Fetch inventory
   useEffect(() => {
     if (pharmacyId) {
       fetchInventory();
     }
-  }, [pharmacyId]);
+  }, [pharmacyId, fetchInventory]);
 
   // Filter inventory
   useEffect(() => {
@@ -101,25 +120,6 @@ export default function PharmacyInventoryPage() {
       );
     }
   }, [searchQuery, inventory]);
-
-  const fetchInventory = async () => {
-    if (!pharmacyId) return;
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/pharmacies/${pharmacyId}/inventory`);
-      const data = await res.json();
-      if (res.ok) {
-        setInventory(data.inventory || []);
-      } else {
-        setMessage({ type: "error", text: data.error || "Failed to load inventory" });
-      }
-    } catch (err) {
-      console.error("Failed to fetch inventory:", err);
-      setMessage({ type: "error", text: "Failed to load inventory" });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (itemId: number) => {
     if (!pharmacyId) return;
