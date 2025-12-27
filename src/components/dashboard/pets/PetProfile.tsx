@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pet } from "@/lib/pets";
+import { Pet, deletePet } from "@/lib/pets";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   listSkinDiseaseRecords,
+  clearSkinDiseaseHistory,
   type SkinDiseaseRecord,
 } from "@/lib/skin-disease-records";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { UserRole } from "@/types/next-auth";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 interface PetProfileProps {
   pet: Pet;
@@ -21,8 +23,13 @@ export default function PetProfile({ pet }: PetProfileProps) {
   const { data: session } = useSession();
   const userRole = ((session?.user as any)?.userRole as UserRole) || "USER";
   const isVeterinarian = userRole === "VETERINARIAN";
+  const isOwner = userRole === "USER";
   const [skinRecords, setSkinRecords] = useState<SkinDiseaseRecord[]>([]);
   const [skinLoading, setSkinLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isClearingHistory, setIsClearingHistory] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showClearHistoryModal, setShowClearHistoryModal] = useState(false);
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "—";
@@ -38,6 +45,13 @@ export default function PetProfile({ pet }: PetProfileProps) {
   };
 
   useEffect(() => {
+    // Don't load records if pet ID is invalid
+    if (!pet?.id) {
+      setSkinRecords([]);
+      setSkinLoading(false);
+      return;
+    }
+
     let cancelled = false;
     (async () => {
       setSkinLoading(true);
@@ -45,7 +59,7 @@ export default function PetProfile({ pet }: PetProfileProps) {
         const records = await listSkinDiseaseRecords(pet.id);
         if (!cancelled) setSkinRecords(records || []);
       } catch (e) {
-        console.error("Error loading skin disease records:", e);
+        // Silently handle errors (404s are expected if pet was deleted)
         if (!cancelled) setSkinRecords([]);
       } finally {
         if (!cancelled) setSkinLoading(false);
@@ -56,10 +70,124 @@ export default function PetProfile({ pet }: PetProfileProps) {
     };
   }, [pet.id]);
 
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
+    setShowDeleteModal(false);
+    try {
+      const success = await deletePet(pet.id);
+      if (success) {
+        // Immediately redirect to prevent any further API calls
+        router.replace("/dashboard/pets");
+      } else {
+        alert("Failed to delete pet. Please try again.");
+        setIsDeleting(false);
+      }
+    } catch (error) {
+      console.error("Error deleting pet:", error);
+      alert("Failed to delete pet. Please try again.");
+      setIsDeleting(false);
+    }
+  };
+
+  const handleClearHistoryClick = () => {
+    setShowClearHistoryModal(true);
+  };
+
+  const handleClearHistoryConfirm = async () => {
+    setIsClearingHistory(true);
+    try {
+      await clearSkinDiseaseHistory(pet.id);
+      // Refresh the records list
+      setSkinRecords([]);
+      setShowClearHistoryModal(false);
+    } catch (error) {
+      console.error("Error clearing skin disease history:", error);
+      alert("Failed to clear history. Please try again.");
+    } finally {
+      setIsClearingHistory(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="space-y-4">
+        {/* Top row: Back button and Action buttons */}
+        <div className="flex items-center justify-between">
+          {/* Back to Pets Button */}
+          <button
+            onClick={() => router.push("/dashboard/pets")}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Pets
+          </button>
+
+          {/* Edit and Delete buttons */}
+          <div className="flex items-center gap-2">
+            {!isVeterinarian && (
+              <Link
+                href={`/dashboard/pets/${pet.id}/edit`}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+                Edit
+              </Link>
+            )}
+            {isOwner && (
+              <button
+                onClick={handleDeleteClick}
+                disabled={isDeleting}
+                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Pet Info Row */}
         <div className="flex items-center gap-4">
           {/* Avatar */}
           <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -86,49 +214,6 @@ export default function PetProfile({ pet }: PetProfileProps) {
               Profile
             </p>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {!isVeterinarian && (
-            <Link
-              href={`/dashboard/pets/${pet.id}/edit`}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              Edit
-            </Link>
-          )}
-          <button
-            onClick={() => router.push("/dashboard/pets")}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Pets
-          </button>
         </div>
       </div>
 
@@ -274,12 +359,23 @@ export default function PetProfile({ pet }: PetProfileProps) {
               Recent skin scans for this pet
             </p>
           </div>
-          <Link
-            href="/dashboard/skin-disease"
-            className="text-sm text-blue-600 hover:text-blue-800 underline whitespace-nowrap"
-          >
-            New scan
-          </Link>
+          <div className="flex items-center gap-3">
+            {isOwner && skinRecords.length > 0 && (
+              <button
+                onClick={handleClearHistoryClick}
+                disabled={isClearingHistory}
+                className="cursor-pointer text-sm text-red-600 hover:text-red-800 underline whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Clear History
+              </button>
+            )}
+            <Link
+              href="/dashboard/skin-disease"
+              className="text-sm text-blue-600 hover:text-blue-800 underline whitespace-nowrap cursor-pointer"
+            >
+              New scan
+            </Link>
+          </div>
         </div>
 
         {skinLoading ? (
@@ -340,6 +436,32 @@ export default function PetProfile({ pet }: PetProfileProps) {
           </div>
         )}
       </div>
+
+      {/* Delete Pet Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Pet Profile"
+        message={`Are you sure you want to delete ${pet.name}'s profile? This action cannot be undone and will delete all associated data including images.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmButtonColor="red"
+        isLoading={isDeleting}
+      />
+
+      {/* Clear History Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showClearHistoryModal}
+        onClose={() => setShowClearHistoryModal(false)}
+        onConfirm={handleClearHistoryConfirm}
+        title="Clear Skin Disease History"
+        message={`Are you sure you want to clear all skin disease history for ${pet.name}? This action cannot be undone and will delete all associated images.`}
+        confirmText="Clear History"
+        cancelText="Cancel"
+        confirmButtonColor="red"
+        isLoading={isClearingHistory}
+      />
     </div>
   );
 }

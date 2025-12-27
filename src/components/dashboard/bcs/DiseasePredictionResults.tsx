@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import {
   Activity,
   CheckCircle,
@@ -21,8 +21,12 @@ import type {
   SingleDiseasePrediction,
   RiskLevel,
   DiseaseType,
-} from '@/types/disease-prediction';
-import { DISEASE_INFO, RISK_LEVEL_STYLES, RISK_LEVEL_EMOJI } from '@/types/disease-prediction';
+} from "@/types/disease-prediction";
+import {
+  DISEASE_INFO,
+  RISK_LEVEL_STYLES,
+  RISK_LEVEL_EMOJI,
+} from "@/types/disease-prediction";
 
 interface DiseasePredictionResultsProps {
   result: DiseasePredictionResult;
@@ -37,23 +41,25 @@ export default function DiseasePredictionResults({
   onNewAnalysis,
   onClose,
 }: DiseasePredictionResultsProps) {
-  const [expandedDisease, setExpandedDisease] = React.useState<string | null>(null);
+  const [expandedDisease, setExpandedDisease] = React.useState<string | null>(
+    null,
+  );
 
   const getRiskIcon = (riskLevel: RiskLevel) => {
     switch (riskLevel) {
-      case 'High':
+      case "High":
         return <AlertCircle className="w-5 h-5 text-red-600" />;
-      case 'Moderate':
+      case "Moderate":
         return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
-      case 'Low':
+      case "Low":
         return <CheckCircle className="w-5 h-5 text-green-600" />;
     }
   };
 
   const getProgressBarColor = (probability: number) => {
-    if (probability >= 60) return 'bg-red-500';
-    if (probability >= 30) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (probability >= 60) return "bg-red-500";
+    if (probability >= 30) return "bg-yellow-500";
+    return "bg-green-500";
   };
 
   const toggleExpand = (disease: string) => {
@@ -261,7 +267,9 @@ export default function DiseasePredictionResults({
                 🔬 Disease Risk Analysis Complete
               </h2>
               <p className="text-purple-100 text-sm">
-                {petName ? `Results for ${petName}` : 'Multi-disease risk assessment results'}
+                {petName
+                  ? `Results for ${petName}`
+                  : "Multi-disease risk assessment results"}
               </p>
             </div>
           </div>
@@ -273,11 +281,13 @@ export default function DiseasePredictionResults({
 
       <div className="p-6 space-y-6">
         {/* Overall Summary */}
-        <div className={`p-6 rounded-xl border-2 ${
-          result.has_risk
-            ? 'bg-gradient-to-br from-red-50 to-orange-50 border-red-200'
-            : 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200'
-        }`}>
+        <div
+          className={`p-6 rounded-xl border-2 ${
+            result.has_risk
+              ? "bg-gradient-to-br from-red-50 to-orange-50 border-red-200"
+              : "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
+          }`}
+        >
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -287,13 +297,17 @@ export default function DiseasePredictionResults({
                   <Heart className="w-6 h-6 text-green-600" />
                 )}
                 <h3 className="text-xl font-bold text-gray-900">
-                  {result.has_risk ? 'Health Risks Detected' : 'No Significant Risks'}
+                  {result.has_risk
+                    ? "Health Risks Detected"
+                    : "No Significant Risks"}
                 </h3>
               </div>
               {result.highest_risk_disease && result.has_risk && (
                 <p className="text-gray-700">
-                  <span className="font-semibold">Highest concern:</span>{' '}
-                  <span className="text-red-700 font-bold">{result.highest_risk_disease}</span>
+                  <span className="font-semibold">Highest concern:</span>{" "}
+                  <span className="text-red-700 font-bold">
+                    {result.highest_risk_disease}
+                  </span>
                 </p>
               )}
             </div>
@@ -301,11 +315,17 @@ export default function DiseasePredictionResults({
               <div className="flex items-center gap-4">
                 <div className="text-center">
                   <p className="text-xs text-gray-500 uppercase">Age Group</p>
-                  <p className="font-bold text-gray-900">{result.pet_profile.age_group}</p>
+                  <p className="font-bold text-gray-900">
+                    {result.pet_profile.age_group}
+                  </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 uppercase">Weight Status</p>
-                  <p className="font-bold text-gray-900">{result.pet_profile.weight_status}</p>
+                  <p className="text-xs text-gray-500 uppercase">
+                    Weight Status
+                  </p>
+                  <p className="font-bold text-gray-900">
+                    {result.pet_profile.weight_status}
+                  </p>
                 </div>
                 {result.has_risk ? (
                   <div className="text-center">
@@ -341,7 +361,8 @@ export default function DiseasePredictionResults({
         {/* Disease Predictions Grid */}
         <div>
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            📊 Disease Risk Assessment ({result.predictions.length} conditions analyzed)
+            📊 Disease Risk Assessment ({result.predictions.length} conditions
+            analyzed)
           </h3>
 
           <div className="space-y-3">
@@ -354,9 +375,9 @@ export default function DiseasePredictionResults({
                 <div
                   key={prediction.disease}
                   className={`border-2 rounded-xl overflow-hidden transition-all ${
-                    prediction.is_positive && prediction.disease !== 'Healthy'
+                    prediction.is_positive && prediction.disease !== "Healthy"
                       ? riskStyles.border
-                      : 'border-gray-200'
+                      : "border-gray-200"
                   }`}
                 >
                   {/* Disease Header */}
@@ -364,16 +385,22 @@ export default function DiseasePredictionResults({
                     type="button"
                     onClick={() => toggleExpand(prediction.disease)}
                     className={`w-full p-4 flex items-center justify-between ${
-                      prediction.is_positive && prediction.disease !== 'Healthy'
+                      prediction.is_positive && prediction.disease !== "Healthy"
                         ? riskStyles.bg
-                        : 'bg-gray-50 hover:bg-gray-100'
+                        : "bg-gray-50 hover:bg-gray-100"
                     } transition-colors`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{diseaseInfo?.icon || '🔬'}</span>
+                      <span className="text-2xl">
+                        {diseaseInfo?.icon || "🔬"}
+                      </span>
                       <div className="text-left">
-                        <p className="font-bold text-gray-900">{prediction.disease}</p>
-                        <p className="text-sm text-gray-600">{diseaseInfo?.description || ''}</p>
+                        <p className="font-bold text-gray-900">
+                          {prediction.disease}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {diseaseInfo?.description || ""}
+                        </p>
                       </div>
                     </div>
 
@@ -403,11 +430,12 @@ export default function DiseasePredictionResults({
                       )}
 
                       {/* Status Badge */}
-                      {prediction.is_positive && prediction.disease !== 'Healthy' && (
-                        <span className="px-3 py-1.5 bg-red-600 text-white rounded-lg font-bold text-sm">
-                          POSITIVE
-                        </span>
-                      )}
+                      {prediction.is_positive &&
+                        prediction.disease !== "Healthy" && (
+                          <span className="px-3 py-1.5 bg-red-600 text-white rounded-lg font-bold text-sm">
+                            POSITIVE
+                          </span>
+                        )}
 
                       {/* Expand Icon */}
                       {isExpanded ? (
@@ -452,7 +480,10 @@ export default function DiseasePredictionResults({
                           </p>
                           <ul className="space-y-1">
                             {prediction.key_indicators.map((indicator, idx) => (
-                              <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                              <li
+                                key={idx}
+                                className="flex items-center gap-2 text-sm text-gray-600"
+                              >
                                 <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                                 {indicator}
                               </li>
@@ -489,9 +520,10 @@ export default function DiseasePredictionResults({
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-amber-800">
-              <strong>Important Disclaimer:</strong> This AI-powered analysis is for informational purposes only 
-              and should not replace professional veterinary diagnosis. Please consult a licensed veterinarian 
-              for proper medical evaluation and treatment.
+              <strong>Important Disclaimer:</strong> This AI-powered analysis is
+              for informational purposes only and should not replace
+              professional veterinary diagnosis. Please consult a licensed
+              veterinarian for proper medical evaluation and treatment.
             </div>
           </div>
         </div>
