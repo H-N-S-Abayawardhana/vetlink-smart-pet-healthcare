@@ -544,7 +544,7 @@
 
 "@gradio/client@^2.0.1":
   version "2.0.1"
-  resolved "https://registry.npmjs.org/@gradio/client/-/client-2.0.1.tgz#3a1100f9649951682251484f2db6219778f23214"
+  resolved "https://registry.npmjs.org/@gradio/client/-/client-2.0.1.tgz"
   integrity sha512-NLaQNj5fn+Klgtf9ESL2NhlfBo9GHYjxBCbLMXamRev36nQ/fVmhKV2V2DLV91IVTbL/gAMzeTsCmZ1Cl2CLlQ==
   dependencies:
     fetch-event-stream "^0.1.5"
@@ -2143,7 +2143,7 @@ fdir@^6.5.0:
 
 fetch-event-stream@^0.1.5:
   version "0.1.6"
-  resolved "https://registry.npmjs.org/fetch-event-stream/-/fetch-event-stream-0.1.6.tgz#5013b504cfb96ea47532710b9bc555b6e991a4f3"
+  resolved "https://registry.npmjs.org/fetch-event-stream/-/fetch-event-stream-0.1.6.tgz"
   integrity sha512-GREtJ5HNikdU2AXtZ6E/5bk+aslMU6ie5mPG6H9nvsdDkkHQ6m5lHwmmmDTOBexok9hApQ7EprsXCdmz9ZC68w==
 
 fflate@^0.8.1:

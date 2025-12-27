@@ -44,3 +44,38 @@ CREATE INDEX IF NOT EXISTS idx_gait_analyses_predicted_disease ON gait_analyses(
 
 -- Add comment to table
 COMMENT ON TABLE gait_analyses IS 'Stores gait analysis results including limping detection and disease risk predictions';
+
+
+CREATE TABLE IF NOT EXISTS pharmacies (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    
+    -- Basic Information
+    name VARCHAR(255) NOT NULL,
+    address TEXT,
+    
+    -- Location
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    
+    -- Contact Information
+    phone VARCHAR(50),
+    email VARCHAR(255),
+    
+    -- Delivery Options
+    pickup_available BOOLEAN DEFAULT true,
+    delivery_available BOOLEAN DEFAULT false,
+    delivery_fee DECIMAL(10, 2) DEFAULT 0,
+    
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_pharmacies_owner_id ON pharmacies(owner_id);
+CREATE INDEX IF NOT EXISTS idx_pharmacies_created_at ON pharmacies(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_pharmacies_location ON pharmacies(latitude, longitude);
+
+-- Add comment to table
+COMMENT ON TABLE pharmacies IS 'Stores pharmacy registration information';
